@@ -1,0 +1,31 @@
+{
+  "name": "@gouvfr/dsfr-doc",
+  "version": "1.0.0",
+  "description": "source agrégées des versions du Système de Design de l'Etat - DSFR pour le site de documentation",
+  "repository": "git@github.com:GouvernementFR/dsfr-doc.git",
+  "author": "Service d'Information du Gouvernement <maxime.beaugrand@pm.gouv.fr>",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006 -c versions/1.11.0/.storybook",
+    "build-storybook": "storybook build"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.6.17",
+    "@storybook/addon-interactions": "^7.6.17",
+    "@storybook/addon-links": "^7.6.17",
+    "@storybook/blocks": "^7.6.17",
+    "@storybook/html": "^7.6.17",
+    "@storybook/html-vite": "^7.6.17",
+    "@storybook/testing-library": "^0.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.6.17",
+    "vite": "^5.2.8"
+  },
+  "dependencies": {
+    "@gouvfr/dsfr": "^1.11.2",
+    "@gouvfr/dsfr-doc-cli": "github:GouvernementFR/dsfr-doc-cli"
+  }
+}

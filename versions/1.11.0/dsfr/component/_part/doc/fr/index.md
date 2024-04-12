@@ -1,0 +1,1 @@
+{ parts: components, display: cards }
