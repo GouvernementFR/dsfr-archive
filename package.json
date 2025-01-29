@@ -1,31 +1,47 @@
 {
-  "name": "@gouvfr/dsfr-doc",
+  "name": "@gouvfr/dsfr-archive",
   "version": "1.0.0",
-  "description": "source agrégées des versions du Système de Design de l'Etat - DSFR pour le site de documentation",
-  "repository": "git@github.com:GouvernementFR/dsfr-doc.git",
-  "author": "Service d'Information du Gouvernement <maxime.beaugrand@pm.gouv.fr>",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "description": " Système de Design de l’État - DSFR",
+  "keywords": [
+    "Système de Design de l'État",
+    "gouvfr",
+    "dsfr"
+  ],
+  "homepage": "https://github.com/GouvernementFR/dsfr-archive/tree/main/[path]",
+  "author": {
+    "name": "Service d'Information du Gouvernement",
+    "email": "maxime.beaugrand@pm.gouv.fr",
+    "url": "https://www.systeme-de-design.gouv.fr/"
+  },
+  "contributors": [
+    {
+      "name": "Bertrand Larrieu",
+      "email": "bertrand.larrieu@actimage.com"
+    },
+    {
+      "name": "Keryan Sanié",
+      "email": "keryan.sanie@actimage.com"
+    },
+    {
+      "name": "Baptiste Zeller",
+      "email": "baptiste.zeller@actimage.com"
+    }
+  ],
+  "repository": "git@github.com:GouvernementFR/dsfr-archive.git",
+  "private": true,
   "type": "module",
-  "scripts": {
-    "storybook": "storybook dev -p 6006 -c versions/1.11.0/.storybook",
-    "build-storybook": "storybook build"
+  "engines": {
+    "node": ">=20.9.0"
   },
-  "keywords": [],
+  "packageManager": "yarn@4.5.2+sha224.c2e2e9ed3cdadd6ec250589b3393f71ae56d5ec297af11cec1eba3b4",
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.17",
-    "@storybook/addon-interactions": "^7.6.17",
-    "@storybook/addon-links": "^7.6.17",
-    "@storybook/blocks": "^7.6.17",
-    "@storybook/html": "^7.6.17",
-    "@storybook/html-vite": "^7.6.17",
-    "@storybook/testing-library": "^0.2.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "storybook": "^7.6.17",
-    "vite": "^5.2.8"
-  },
-  "dependencies": {
-    "@gouvfr/dsfr": "^1.11.2",
-    "@gouvfr/dsfr-doc-cli": "github:GouvernementFR/dsfr-doc-cli"
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@gouvfr/dsfr-cli": "git+https://github.com/GouvernementFR/dsfr-cli.git#pck/doc/@cli",
+    "@gouvfr/dsfr-compiler": "git+https://github.com/GouvernementFR/dsfr-cli.git#pck/doc/@compiler",
+    "@gouvfr/dsfr-doc-publisher": "git+https://github.com/GouvernementFR/dsfr-cli.git#pck/doc/@doc-publisher",
+    "@gouvfr/dsfr-doc-static": "git+https://github.com/GouvernementFR/dsfr-cli.git#pck/doc/@doc-static",
+    "@gouvfr/dsfr-forge": "git+https://github.com/GouvernementFR/dsfr-cli.git#pck/doc/@forge",
+    "husky": "^9.1.7"
   }
 }

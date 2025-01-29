@@ -1,2 +1,0 @@
-class r{constructor(t={id:"",classes:[],attributes:{}}){this._id=t.id,this._classes=t.classes||[],this._attributes=t.attributes||{}}get classes(){return this._classes}get attributes(){return{...this._attributes},this._id&&this._id,this._attributes}includeClasses(t=null){return t??(t=this.classes),!t||t.length===0?"":`class="${t.join(" ")}"`}includeAttributes(t=null){t??(t=this.attributes);const s=Object.keys(t);return s.length===0?"":s.map(i=>`${i}="${t[i]}"`).join(" ")}}export{r as B};
-//# sourceMappingURL=basis-tmdZkPxa.js.map
