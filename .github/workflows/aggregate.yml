@@ -1,9 +1,8 @@
 name: Aggregate
 
 on:
-  repository_dispatch:
-    types:
-      - release_published
+  workflow_dispatch:
+
 
 jobs:
   build-and-release:

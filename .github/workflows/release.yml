@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '22.14.0'
-          cache: 'yarn'
 
       # Increment the patch version in package.json
       - name: Increment patch version
