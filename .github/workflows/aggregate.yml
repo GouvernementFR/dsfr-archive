@@ -1,0 +1,89 @@
+name: Aggregate
+
+on:
+  repository_dispatch:
+    types:
+      - release_published
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check if the tag is >= 1.14.0
+      # - name: Check tag version
+      #  id: check_version
+      #  run: |
+      #    version=${{ github.event.client_payload.release.tag_name }}
+      #    if [ "$(printf '%s\n' "1.14.0" "$version" | sort -V | head -n1)" != "1.14.0" ]; then
+      #      echo "Tag is less than 1.14.0. Exiting."
+      #      exit 1
+      #    fi
+
+      # Checkout the dsfr repository
+      - name: Checkout dsfr repository
+        uses: actions/checkout@v3
+        with:
+          repository: GouvernementFR/dsfr
+          ref: ${{ github.event.client_payload.release.tag_name }}
+
+      # Set up Node.js and Yarn
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.14.0'
+          cache: 'yarn'
+        continue-on-error: false
+
+      - name: Install dependencies
+        run: yarn install
+        continue-on-error: false
+
+      # Build the project
+      - name: Build the project
+        run: yarn release
+
+      # Copy files to a temporary folder
+      - name: Copy files to a temporary folder
+        run: |
+          mkdir -p temp/release
+          cp -r dist src storybook changelog.yml package.json temp/release
+
+      # Extract version from tag
+      - name: Extract version
+        id: version
+        run: |
+          dest=releases/${{ github.event.client_payload.release.tag_name }}
+          echo "dest=$dest" >> $GITHUB_ENV
+
+      # Checkout dsfr-archive repository
+      - name: Checkout dsfr-archive repository
+        uses: actions/checkout@v3
+        with:
+          repository: GouvernementFR/dsfr-archive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Remove existing release folder if it exists
+      - name: Remove existing release folder
+        run: |
+          rm -rf ${{ env.dest }}
+
+      # Copy required files
+      - name: Copy files to release folder
+        run: |
+          mkdir -p ${{ env.dest }}
+          cp -r temp/release/* ${{ env.dest }}     
+
+      # Remove existing release folder in dsfr-archive
+      - name: Remove existing release folder in dsfr-archive
+        run: |
+          rm -rf temp
+
+      # Commit and push changes
+      - name: Commit and push release
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "DSFR published release ${{ github.event.client_payload.release.tag_name }}"
+          git push

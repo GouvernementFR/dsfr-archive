@@ -1,0 +1,63 @@
+name: Increment Version and Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  increment-build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.14.0'
+          cache: 'yarn'
+
+      # Increment the patch version in package.json
+      - name: Increment patch version
+        run: |
+          current_version=$(jq -r '.version' package.json)
+          new_version=$(echo $current_version | awk -F. '{print $1"."$2"."$3+1}')
+          jq ".version = \"$new_version\"" package.json > package.tmp.json && mv package.tmp.json package.json
+          echo "New version: $new_version"
+          echo "version=$new_version" >> $GITHUB_ENV
+
+      # Commit the updated package.json
+      - name: Commit updated version
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add package.json
+          git commit -m "Increment version to ${{ env.version }}"
+          git push
+
+      # Upgrade CLI dependencies
+      - name: Upgrade CLI dependencies
+        run: yarn upgrade @gouvfr/dsfr-nexus @gouvfr/dsfr-forge @gouvfr/dsfr-alchemist @gouvfr/dsfr-roller @gouvfr/dsfr-lore
+
+      # Build the project
+      - name: Build the project
+        run: |
+          yarn dsfr configure
+          yarn dsfr interpret
+          yarn dsfr publish
+
+      # Zip the .doc folder
+      - name: Zip .doc folder
+        run: |
+          zip -r doc-${{ env.version }}.zip .doc
+
+      # Create a release and upload the zip file
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ env.version }} doc-${{ env.version }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
