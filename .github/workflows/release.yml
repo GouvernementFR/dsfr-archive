@@ -19,6 +19,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '22.14.0'
+          cache: 'yarn'
+
+      # Enable corepack
+      - name: Enable corepack
+        run: |
+          corepack enable
+          yarn
 
       # Increment the patch version in package.json
       - name: Increment patch version
@@ -37,10 +44,6 @@ jobs:
           git add package.json
           git commit -m "Increment version to ${{ env.version }}"
           git push
-
-      # Upgrade CLI dependencies
-      - name: Upgrade CLI dependencies
-        run: yarn upgrade @gouvfr/dsfr-nexus @gouvfr/dsfr-forge @gouvfr/dsfr-alchemist @gouvfr/dsfr-roller @gouvfr/dsfr-lore
 
       # Build the project
       - name: Build the project

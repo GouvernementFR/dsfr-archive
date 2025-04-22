@@ -7,7 +7,7 @@
     "gouvfr",
     "dsfr"
   ],
-  "homepage": "https://github.com/GouvernementFR/dsfr-archive/tree/main/[path]",
+  "homepage": "https://github.com/GouvernementFR/dsfr-archive/tree/main",
   "author": {
     "name": "Service d'Information du Gouvernement",
     "email": "maxime.beaugrand@pm.gouv.fr",
@@ -27,7 +27,10 @@
       "email": "baptiste.zeller@actimage.com"
     }
   ],
-  "repository": "git@github.com:GouvernementFR/dsfr-archive.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/GouvernementFR/dsfr-archive.git"
+  },
   "private": true,
   "type": "module",
   "engines": {
@@ -35,23 +38,12 @@
   },
   "packageManager": "yarn@4.5.2+sha224.c2e2e9ed3cdadd6ec250589b3393f71ae56d5ec297af11cec1eba3b4",
   "scripts": {
-    "chouquette": "yarn upgrade @gouvfr/dsfr-nexus @gouvfr/dsfr-forge @gouvfr/dsfr-alchemist @gouvfr/dsfr-roller @gouvfr/dsfr-lore"
+    "upgrade-nexus": "yarn upgrade @gouvfr/dsfr-nexus"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
-    "@gouvfr/dsfr-alchemist": "../dsfr-chouquette/modules/alchemist",
-    "@gouvfr/dsfr-forge": "../dsfr-chouquette/modules/forge",
-    "@gouvfr/dsfr-lore": "../dsfr-chouquette/modules/lore",
-    "@gouvfr/dsfr-nexus": "../dsfr-chouquette/modules/nexus",
-    "@gouvfr/dsfr-roller": "../dsfr-chouquette/modules/roller",
+    "@gouvfr/dsfr-nexus": "^1.0.0",
     "husky": "^9.1.7"
-  },
-  "resolutions": {
-    "@gouvfr/dsfr-nexus": "../dsfr-chouquette/modules/nexus",
-    "@gouvfr/dsfr-forge": "../dsfr-chouquette/modules/forge",
-    "@gouvfr/dsfr-alchemist": "../dsfr-chouquette/modules/alchemist",
-    "@gouvfr/dsfr-lore": "../dsfr-chouquette/modules/lore",
-    "@gouvfr/dsfr-roller": "../dsfr-chouquette/modules/roller"
   }
 }
