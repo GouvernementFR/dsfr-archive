@@ -34,7 +34,7 @@ jobs:
         run: |
           corepack enable
           yarn
-
+          
       # Build the project
       - name: Build the project
         run: |
@@ -49,17 +49,15 @@ jobs:
           current_version=$(jq -r '.version' package.json)
           echo "Current version: $current_version"
           echo "version=$current_version" >> $GITHUB_ENV
-
+  
       # Perform the release using the current version
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd .doc
-          zip -r ../archive-${{ env.version }}.zip .
-          cd ..
+          zip -r archive-${{ env.version }}.zip .doc/*
           gh release create ${{ env.version }} archive-${{ env.version }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
-
+  
       # Increment the patch version in package.json
       - name: Increment patch version
         run: |
@@ -68,7 +66,7 @@ jobs:
           jq ".version = \"$new_version\"" package.json > package.tmp.json && mv package.tmp.json package.json
           echo "New version: $new_version"
           echo "version=$new_version" >> $GITHUB_ENV
-
+  
       # Commit the updated package.json
       - name: Commit updated version
         run: |
