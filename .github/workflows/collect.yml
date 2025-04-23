@@ -13,14 +13,14 @@ jobs:
 
     steps:
       # Check if the tag is >= v1.14.0
-      # - name: Check tag version
-      #  id: check_version
-      #  run: |
-      #    version=${{ inputs.tag }}"
-      #    if [ "$(printf '%s\n' "v1.14.0" "$version" | sort -V | head -n1)" != "v1.14.0" ]; then
-      #      echo "Tag is less than v1.14.0. Exiting."
-      #      exit 1
-      #    fi
+      - name: Check tag version
+        id: check_version
+        run: |
+          version=${{ inputs.tag }}"
+          if [ "$(printf '%s\n' "v1.14.0" "$version" | sort -V | head -n1)" != "v1.14.0" ]; then
+            echo "Tag is less than v1.14.0. Exiting."
+            exit 1
+          fi
 
       # Checkout the dsfr repository
       - name: Checkout dsfr repository
@@ -43,13 +43,13 @@ jobs:
 
       # Build the project
       - name: Build the project
-        run: yarn release
+        run: yarn archive
 
       # Copy files to a temporary folder
       - name: Copy files to a temporary folder
         run: |
           mkdir -p temp/release
-          cp -r dist src storybook changelog.yml package.json temp/release
+          cp -r src storybook changelog.yml package.json temp/release
 
       # Extract version from tag
       - name: Extract version

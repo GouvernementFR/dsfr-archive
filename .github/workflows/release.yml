@@ -14,6 +14,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Check if a releases exists
+      - name: Check for existing releases
+        id: check_release
+        run: |
+          if [ ! -d "releases" ] || [ "$(find releases -mindepth 1 -type d | wc -l)" -eq 0 ]; then
+              echo "Releases directory does not exist or is empty."
+          fi
+
       # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
