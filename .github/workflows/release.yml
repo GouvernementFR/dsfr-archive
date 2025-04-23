@@ -20,6 +20,7 @@ jobs:
         run: |
           if [ ! -d "releases" ] || [ "$(find releases -mindepth 1 -type d | wc -l)" -eq 0 ]; then
               echo "Releases directory does not exist or is empty."
+              exit 1
           fi
 
       # Set up Node.js
