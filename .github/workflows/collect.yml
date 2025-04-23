@@ -42,8 +42,8 @@ jobs:
         continue-on-error: false
 
       # Build the project
-      - name: Build the project
-        run: yarn archive
+      #- name: Build the project
+      #  run: yarn archive
 
       # Set the destination folder as an environment variable
       - name: Set destination folder
@@ -54,7 +54,7 @@ jobs:
       - name: Copy files to release folder
         run: |
           mkdir -p $DEST
-          cp -r src storybook changelog.yml package.json $DEST
+          cp -r src changelog.yml package.json $DEST
 
       - name: Stash the release folder
         run: |
