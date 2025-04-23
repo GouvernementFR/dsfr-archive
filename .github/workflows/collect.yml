@@ -49,17 +49,13 @@ jobs:
       - name: Set destination folder
         run: |
           echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
+          echo "TMP=tmp/" >> $GITHUB_ENV
 
       # Use the environment variable in subsequent steps
-      - name: Copy files to release folder
+      - name: Copy files to temp folder
         run: |
-          mkdir -p $DEST
-          cp -r src changelog.yml package.json $DEST
-
-      - name: Stash the release folder
-        run: |
-          git add $DEST
-          git stash push -m "Stash release ${{ inputs.tag }}" $DEST
+          mkdir -p $TMP
+          cp -r src changelog.yml package.json $TMP
 
       # Checkout dsfr-archive repository
       - name: Checkout dsfr-archive repository
@@ -73,10 +69,12 @@ jobs:
         run: |
           rm -rf $DEST
 
-      # Pop the stash to restore the release folder
-      - name: Pop the stash
+      # copy files to the release folder
+      - name: Copy files to release folder
         run: |
-          git stash pop
+          mkdir -p $DEST
+          cp -r $TMP/* $DEST
+          rm -rf $TMP
 
       # Commit and push changes
       - name: Commit and push release
