@@ -45,18 +45,17 @@ jobs:
       - name: Build the project
         run: yarn archive
 
-      # Copy files to a temporary folder
-      - name: Copy files to a temporary folder
-        run: |
-          mkdir -p temp/release
-          cp -r src storybook changelog.yml package.json temp/release
-
-      # Extract version from tag
-      - name: Extract version
-        id: version
+      # Copy files directly to the final folder
+      - name: Copy files to release folder
         run: |
           dest=releases/${{ inputs.tag }}
-          echo "dest=$dest" >> $GITHUB_ENV
+          mkdir -p $dest
+          cp -r src storybook changelog.yml package.json $dest
+
+      # Stash the release folder
+      - name: Stash release folder
+        run: |
+          git stash push -m "Stash release ${{ inputs.tag }}" releases/${{ inputs.tag }}
 
       # Checkout dsfr-archive repository
       - name: Checkout dsfr-archive repository
@@ -68,18 +67,12 @@ jobs:
       # Remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
-          rm -rf ${{ env.dest }}
+          rm -rf releases/${{ inputs.tag }}
 
-      # Copy required files
-      - name: Copy files to release folder
+      # Pop the stash to restore the release folder
+      - name: Pop the stash
         run: |
-          mkdir -p ${{ env.dest }}
-          cp -r temp/release/* ${{ env.dest }}     
-
-      # Remove existing release folder in dsfr-archive
-      - name: Remove existing release folder in dsfr-archive
-        run: |
-          rm -rf temp
+          git stash pop
 
       # Commit and push changes
       - name: Commit and push release
