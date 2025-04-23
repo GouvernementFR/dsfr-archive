@@ -23,11 +23,20 @@ jobs:
           fi
 
       # Checkout the dsfr repository
-      - name: Checkout dsfr repository
-        uses: actions/checkout@v3
+      - name: Checkout dsfr
+        uses: actions/checkout@v4
         with:
           repository: GouvernementFR/dsfr
           ref: ${{ inputs.tag }}
+          path: dsfr
+
+      # Checkout the dsfr-archive
+      - name: Checkout dsfr-archive
+        uses: actions/checkout@v4
+        with:
+          repository: GouvernementFR/dsfr-archive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: archive
 
       # Set up Node.js and Yarn
       - name: Set up Node.js
@@ -37,44 +46,32 @@ jobs:
           cache: 'yarn'
         continue-on-error: false
 
-      #- name: Install dependencies
-      #  run: yarn install
-      #  continue-on-error: false
+      - name: Install dependencies
+        run: yarn install
+        working-directory: dsfr
+        continue-on-error: false
 
       # Build the project
-      #- name: Build the project
-      #  run: yarn archive
+      - name: Build the project
+        run: yarn archive
+        working-directory: dsfr
 
       # Set the destination folder as an environment variable
       - name: Set destination folder
         run: |
           echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
-          echo "TMP=tmp" >> $GITHUB_ENV
-
-      # Use the environment variable in subsequent steps
-      - name: Copy files to temp folder
-        run: |
-          mkdir -p $TMP
-          cp -r src changelog.yml package.json $TMP
-
-      # Checkout dsfr-archive repository
-      - name: Checkout dsfr-archive repository
-        uses: actions/checkout@v3
-        with:
-          repository: GouvernementFR/dsfr-archive
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
           rm -rf $DEST
+        working-directory: archive
 
-      # copy files to the release folder
-      - name: Copy files to release folder
+      # Use the environment variable in subsequent steps
+      - name: Copy files to temp folder
         run: |
-          mkdir -p $DEST
-          cp -r $TMP/* $DEST
-          rm -rf $TMP
+          mkdir -p $TMP
+          cp -r dsfr/src dsfr/changelog.yml dsfr/package.json archive/$DEST
 
       # Commit and push changes
       - name: Commit and push release
@@ -84,3 +81,4 @@ jobs:
           git add .
           git commit -m "DSFR published release ${{ inputs.tag }}"
           git push
+        working-directory: archive
