@@ -45,17 +45,21 @@ jobs:
       - name: Build the project
         run: yarn archive
 
-      # Copy files directly to the final folder
+      # Set the destination folder as an environment variable
+      - name: Set destination folder
+        run: |
+          echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
+
+      # Use the environment variable in subsequent steps
       - name: Copy files to release folder
         run: |
-          dest=releases/${{ inputs.tag }}
-          mkdir -p $dest
-          cp -r src storybook changelog.yml package.json $dest
+          mkdir -p $DEST
+          cp -r src storybook changelog.yml package.json $DEST
 
-      # Stash the release folder
-      - name: Stash release folder
+      - name: Stash the release folder
         run: |
-          git stash push -m "Stash release ${{ inputs.tag }}" releases/${{ inputs.tag }}
+          git add $DEST
+          git stash push -m "Stash release ${{ inputs.tag }}" $DEST
 
       # Checkout dsfr-archive repository
       - name: Checkout dsfr-archive repository
@@ -67,7 +71,7 @@ jobs:
       # Remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
-          rm -rf releases/${{ inputs.tag }}
+          rm -rf $DEST
 
       # Pop the stash to restore the release folder
       - name: Pop the stash
