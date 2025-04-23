@@ -37,9 +37,9 @@ jobs:
           cache: 'yarn'
         continue-on-error: false
 
-      - name: Install dependencies
-        run: yarn install
-        continue-on-error: false
+      #- name: Install dependencies
+      #  run: yarn install
+      #  continue-on-error: false
 
       # Build the project
       #- name: Build the project
@@ -49,7 +49,7 @@ jobs:
       - name: Set destination folder
         run: |
           echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
-          echo "TMP=tmp/" >> $GITHUB_ENV
+          echo "TMP=tmp" >> $GITHUB_ENV
 
       # Use the environment variable in subsequent steps
       - name: Copy files to temp folder
