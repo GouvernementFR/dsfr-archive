@@ -69,7 +69,7 @@ jobs:
       - name: Copy files to temp folder
         run: |
           mkdir -p $DEST
-          cp -r dsfr/src dsfr/changelog.yml dsfr/package.json $DEST
+          cp -r dsfr/src dsfr/storybook dsfr/changelog.yml dsfr/package.json $DEST
 
       # Commit and push changes
       - name: Commit and push release
