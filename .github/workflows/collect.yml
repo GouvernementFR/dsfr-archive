@@ -16,7 +16,7 @@ jobs:
       - name: Check tag version
         id: check_version
         run: |
-          version=${{ inputs.tag }}"
+          version=${{ inputs.tag }}
           if [ "$(printf '%s\n' "v1.14.0" "$version" | sort -V | head -n1)" != "v1.14.0" ]; then
             echo "Tag is less than v1.14.0. Exiting."
             exit 1
