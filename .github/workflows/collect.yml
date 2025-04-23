@@ -69,7 +69,7 @@ jobs:
       # Use the environment variable in subsequent steps
       - name: Copy files to temp folder
         run: |
-          mkdir -p $DEST
+          mkdir -p archive/$DEST
           cp -r dsfr/src dsfr/storybook dsfr/changelog.yml dsfr/package.json archive/$DEST
 
       # Commit and push changes
