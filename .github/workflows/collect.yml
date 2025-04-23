@@ -58,18 +58,19 @@ jobs:
       # Set the destination folder as an environment variable
       - name: Set destination folder
         run: |
-          echo "DEST=archive/releases/${{ inputs.tag }}" >> $GITHUB_ENV
+          echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
 
       # Remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
-          rm -rf $DEST
+          git rm -r $DEST
+        working-directory: archive
 
       # Use the environment variable in subsequent steps
       - name: Copy files to temp folder
         run: |
           mkdir -p $DEST
-          cp -r dsfr/src dsfr/storybook dsfr/changelog.yml dsfr/package.json $DEST
+          cp -r dsfr/src dsfr/storybook dsfr/changelog.yml dsfr/package.json archive/$DEST
 
       # Commit and push changes
       - name: Commit and push release
