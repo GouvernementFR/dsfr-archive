@@ -45,6 +45,7 @@ jobs:
           node-version: '22.14.0'
           cache: 'yarn'
         continue-on-error: false
+        working-directory: dsfr
 
       - name: Install dependencies
         run: yarn install
