@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          zip -r archive-${{ env.version }}.zip .doc/*
+          zip -r -j archive-${{ env.version }}.zip .doc/*
           gh release create ${{ env.version }} archive-${{ env.version }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
   
       # Increment the patch version in package.json
