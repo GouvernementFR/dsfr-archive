@@ -78,8 +78,10 @@ jobs:
           fi
           # Create a new branch
           git checkout -b ${{ env.branch }}
-          git rm -r --ignore-unmatch ${{ env.dest }}
-          git commit -m "remove existing release folder"
+          if [ -d "${{ env.dest }}" ]; then
+            git rm -r --ignore-unmatch ${{ env.dest }}
+            git commit -m "remove existing release folder"
+          fi
         working-directory: archive
 
       # Use the environment variable in subsequent steps
