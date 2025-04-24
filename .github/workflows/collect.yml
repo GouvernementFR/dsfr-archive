@@ -87,8 +87,8 @@ jobs:
       # Use the environment variable in subsequent steps
       - name: Copy files to temp folder
         run: |
-          mkdir -p archive/$DEST
-          cp -r dsfr/.archive/ archive/$DEST
+          mkdir -p archive/${{ env.dest }}
+          cp -r dsfr/.archive/* archive/${{ env.dest }}
 
       # Commit and push changes
       - name: Commit and push release
@@ -100,6 +100,6 @@ jobs:
           # merge the branch into the main branch squash
           git checkout main
           git merge --squash ${{ env.branch }}
-          git commit -m "🔖chore: DSFR documentation published release ${{ inputs.tag }}"
+          git commit -m "🚚 chore: collected DSFR release ${{ inputs.tag }}"
           git push
         working-directory: archive
