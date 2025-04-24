@@ -69,6 +69,8 @@ jobs:
       # Create branch and remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           # Check if the branch already exists
           if git show-ref --verify --quiet refs/heads/${{ env.branch }}; then
             echo "Branch ${{ env.branch }} already exists. Deleting it."
