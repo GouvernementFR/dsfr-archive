@@ -103,3 +103,14 @@ jobs:
           git commit -m "🚚 chore: collected DSFR release ${{ inputs.tag }}"
           git push
         working-directory: archive
+
+      # Trigger the release workflow
+      - name: Trigger Release Workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'release-trigger',
+            });
