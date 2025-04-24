@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Check if the tag is >= v1.14.0
+      # Check if the tag is >= v1.14.0 and create environment variables
       - name: Check tag version
         id: check_version
         run: |
@@ -21,6 +21,12 @@ jobs:
             echo "Tag is less than v1.14.0. Exiting."
             exit 1
           fi
+          dest="releases/${{ inputs.tag }}"
+          echo "dest=$dest" >> $GITHUB_ENV
+          major=$(echo "$version" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
+          echo "major=$major" >> $GITHUB_ENV
+          branch="collect/${{ inputs.tag }}"
+          echo "branch=$branch" >> $GITHUB_ENV
 
       # Checkout the dsfr repository
       - name: Checkout dsfr
@@ -45,8 +51,13 @@ jobs:
           node-version: '22.14.0'
         continue-on-error: false
 
+      # Install dependencies
       - name: Install dependencies
-        run: yarn install
+        run: |
+          if [ env.major >= 2 ]; then
+            corepack enable
+          fi          
+          yarn install
         working-directory: dsfr
         continue-on-error: false
 
@@ -55,22 +66,25 @@ jobs:
         run: yarn archive
         working-directory: dsfr
 
-      # Set the destination folder as an environment variable
-      - name: Set destination folder
-        run: |
-          echo "DEST=releases/${{ inputs.tag }}" >> $GITHUB_ENV
-
-      # Remove existing release folder if it exists
+      # Create branch and remove existing release folder if it exists
       - name: Remove existing release folder
         run: |
-          git rm -r $DEST
+          # Check if the branch already exists
+          if git show-ref --verify --quiet refs/heads/${{ env.branch }}; then
+            echo "Branch ${{ env.branch }} already exists. Deleting it."
+            git branch -D ${{ env.branch }}
+          fi
+          # Create a new branch
+          git checkout -b ${{ env.branch }}
+          git rm -r ${{ env.dest }}
+          git commit -m "remove existing release folder"
         working-directory: archive
 
       # Use the environment variable in subsequent steps
       - name: Copy files to temp folder
         run: |
           mkdir -p archive/$DEST
-          cp -r dsfr/src dsfr/storybook dsfr/changelog.yml dsfr/package.json archive/$DEST
+          cp -r .archive/ archive/$DEST
 
       # Commit and push changes
       - name: Commit and push release
@@ -78,6 +92,10 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "DSFR published release ${{ inputs.tag }}"
+          git commit -m "add release files for ${{ inputs.tag }}"
+          # merge the branch into the main branch squash
+          git checkout main
+          git merge --squash --no-ff ${{ env.branch }}
+          git commit -m "🔖chore: DSFR documentation published release ${{ inputs.tag }}"
           git push
         working-directory: archive
