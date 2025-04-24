@@ -18,7 +18,7 @@ jobs:
       - name: Check for existing releases
         id: check_release
         run: |
-          if [ ! -d "releases" ] || [ "$(find releases -mindepth 1 | wc -l)" -eq 0 ]; then
+          if [ ! -d "releases" ]; then
               echo "Releases directory does not exist or is empty."
               exit 1
           fi
