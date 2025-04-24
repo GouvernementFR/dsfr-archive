@@ -99,7 +99,7 @@ jobs:
           git commit -m "add release files for ${{ inputs.tag }}"
           # merge the branch into the main branch squash
           git checkout main
-          git merge --squash --no-ff ${{ env.branch }}
+          git merge --squash ${{ env.branch }}
           git commit -m "🔖chore: DSFR documentation published release ${{ inputs.tag }}"
           git push
         working-directory: archive
