@@ -54,7 +54,7 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          if [ env.major >= 2 ]; then
+          if [ env.major > 1 ]; then
             corepack enable
           fi          
           yarn install
@@ -76,7 +76,7 @@ jobs:
           fi
           # Create a new branch
           git checkout -b ${{ env.branch }}
-          git rm -r ${{ env.dest }}
+          git rm -r --ignore-unmatch ${{ env.dest }}
           git commit -m "remove existing release folder"
         working-directory: archive
 
