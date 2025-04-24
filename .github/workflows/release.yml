@@ -1,4 +1,4 @@
-name: Increment Version and Build
+name: Build, release and Increment version
 
 on:
   push:
@@ -60,7 +60,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          zip -r archive-${{ env.version }}.zip .doc -x "*.DS_Store" && mv .doc www
+          mv .doc www
+          zip -r archive-${{ env.version }}.zip www -x "*.DS_Store"
           gh release create ${{ env.version }} archive-${{ env.version }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
 
       # Increment the patch version in package.json
