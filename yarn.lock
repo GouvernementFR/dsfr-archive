@@ -389,15 +389,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-alchemist@npm:=1.0.2":
-  version: 1.0.2
-  resolution: "@gouvfr/dsfr-alchemist@npm:1.0.2"
+"@gouvfr/dsfr-alchemist@npm:=1.0.7":
+  version: 1.0.7
+  resolution: "@gouvfr/dsfr-alchemist@npm:1.0.7"
   dependencies:
-    "@gouvfr/dsfr-forge": "npm:=1.0.2"
+    "@gouvfr/dsfr-forge": "npm:=1.0.7"
     esbuild: "npm:^0.24.2"
     lightningcss: "npm:^1.29.1"
     sass: "npm:^1.79.3"
-  checksum: 10c0/3ecbd6566d33d629f3ac9b697c0843ad126bc1f2b402ada5f928a0971ef78068561ff1b2591363c8f73f29554f228c2fe27d153296ac7aa2d9aa6256997c7052
+  checksum: 10c0/d9c055854aa00015ef3741dd16d5d4da61dc23635de70f0e7cbb22706918673fc04ef2e99970a692cf2642a85b4fef90748a5f0f680f6b3097f01afed76ff973
   languageName: node
   linkType: hard
 
@@ -407,35 +407,35 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:^19.6.0"
     "@commitlint/config-conventional": "npm:^19.6.0"
-    "@gouvfr/dsfr-nexus": "npm:^1.0.0"
+    "@gouvfr/dsfr-nexus": "npm:^1.0.7"
     husky: "npm:^9.1.7"
   languageName: unknown
   linkType: soft
 
-"@gouvfr/dsfr-forge@npm:=1.0.2":
-  version: 1.0.2
-  resolution: "@gouvfr/dsfr-forge@npm:1.0.2"
-  checksum: 10c0/0e266cefb5b3686758f9458d167a171213b472780be425194d32cbc48ff280403fb706c874cf082a5160e7793bc117eb60e2d5609c26e2d30bc48c8e1b7df1a2
+"@gouvfr/dsfr-forge@npm:=1.0.7":
+  version: 1.0.7
+  resolution: "@gouvfr/dsfr-forge@npm:1.0.7"
+  checksum: 10c0/a9794245f03640652163fc91ac5475fa77c1974cd4315bc061434e8eec0bb2a6b2fbd8a22cf519cf6a5faf490d65648b2f2abd30c53c2fc4ca378280df5c7a3d
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-lore@npm:=1.0.2":
-  version: 1.0.2
-  resolution: "@gouvfr/dsfr-lore@npm:1.0.2"
+"@gouvfr/dsfr-lore@npm:=1.0.7":
+  version: 1.0.7
+  resolution: "@gouvfr/dsfr-lore@npm:1.0.7"
   dependencies:
-    "@gouvfr/dsfr-forge": "npm:=1.0.2"
-  checksum: 10c0/1b5fbe0cca9edfd30d4846f00e8cd09b5c5b9f28757e7e18bd16fd3c036657634e49958419fb19394b95d458afe5d139c079ab713b80b3d214f73543d256ec89
+    "@gouvfr/dsfr-forge": "npm:=1.0.7"
+  checksum: 10c0/887d9d648daaca34beed76a20fb519ad3d4a79eb81a160515fa9a591ea4d3f8e1ab4ad1d724e321d262c8071db28586cb7cab907c51a68c3d3b14bcf712dfcba
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-nexus@npm:^1.0.0":
-  version: 1.0.2
-  resolution: "@gouvfr/dsfr-nexus@npm:1.0.2"
+"@gouvfr/dsfr-nexus@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "@gouvfr/dsfr-nexus@npm:1.0.7"
   dependencies:
-    "@gouvfr/dsfr-alchemist": "npm:=1.0.2"
-    "@gouvfr/dsfr-forge": "npm:=1.0.2"
-    "@gouvfr/dsfr-lore": "npm:=1.0.2"
-    "@gouvfr/dsfr-roller": "npm:=1.0.2"
+    "@gouvfr/dsfr-alchemist": "npm:=1.0.7"
+    "@gouvfr/dsfr-forge": "npm:=1.0.7"
+    "@gouvfr/dsfr-lore": "npm:=1.0.7"
+    "@gouvfr/dsfr-roller": "npm:=1.0.7"
     browser-sync: "npm:^3.0.3"
     del: "npm:^7.1.0"
     mdast-util-directive: "npm:^3.0.0"
@@ -453,7 +453,7 @@ __metadata:
     yargs: "npm:^17.7.2"
   bin:
     dsfr: index.js
-  checksum: 10c0/a1ad787f208b7cbecf241d782bdd124487ac57d712c56d8a20998d96bedfd738cc4b13d662d138f62a7d20568929a0a7288f441032bc50168ac8d292ffff4832
+  checksum: 10c0/bb996fb12052b027781f0e098506bc5df75a3c54828dd247ae33c08590892cbacd688ed43f58ef5dd57976d8dea263b0d0c76fea5f24779d6855fb29174b0203
   languageName: node
   linkType: hard
 
@@ -464,18 +464,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-roller@npm:=1.0.2":
-  version: 1.0.2
-  resolution: "@gouvfr/dsfr-roller@npm:1.0.2"
+"@gouvfr/dsfr-roller@npm:=1.0.7":
+  version: 1.0.7
+  resolution: "@gouvfr/dsfr-roller@npm:1.0.7"
   dependencies:
-    "@gouvfr/dsfr-forge": "npm:=1.0.2"
+    "@gouvfr/dsfr-forge": "npm:=1.0.7"
     "@gouvfr/dsfr-publisher": "npm:@gouvfr/dsfr@1.13.1"
     deepmerge: "npm:^4.3.1"
     ejs: "npm:^3.1.10"
     highlight.js: "npm:^11.10.0"
     prettier: "npm:^3.3.3"
     yaml: "npm:^2.4.1"
-  checksum: 10c0/0f3e36bcba2c7f6f250ffc9046208ce17f9b14d14bcbff5495d1c2c72d0ac568ba7378720ed1df735e94a545a8dc58a5e8deacce3da30b9b917e1de7435b67d3
+  checksum: 10c0/b2e184cae3bfa47c7c49cd4c8999111610fb3bd306fbb6663d9a9f8bf50178e291083966afa055d2bca1de7c2ae48f68eb3a9a07ab38b7a16cde153a96280f52
   languageName: node
   linkType: hard
 
