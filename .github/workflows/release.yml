@@ -41,7 +41,6 @@ jobs:
           echo "TYPE=$TYPE" >> $GITHUB_ENV
           if [ "${TYPE}" != 'release' ]; then
             echo "BRANCH=${TYPE}" >> $GITHUB_ENV
-            git checkout -b "${BRANCH}"
           else
             echo "BRANCH=main" >> $GITHUB_ENV
           fi
@@ -58,6 +57,7 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "RELEASE=${TAG}-${TYPE}" >> $GITHUB_ENV
           echo "FILE=archive-${RELEASE}.zip" >> $GITHUB_ENV
+          git checkout -b "${BRANCH}"
 
       # Set up Node.js
       - name: Set up Node.js
