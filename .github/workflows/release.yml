@@ -9,15 +9,6 @@ on:
     types: [ release-trigger ]
 
   workflow_dispatch:
-    inputs:
-      type:
-        description: 'Type of publication'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - release
-          - test
 
 jobs:
   increment-build-release:
@@ -31,8 +22,12 @@ jobs:
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
-          if [ -n "${{ github.event.inputs.type }}" ] && [ "${{ github.event.inputs.type }}" != "" ]; then
-            TYPE="${{ github.event.inputs.type }}"
+          if [ -n "${{ github.ref_name }}" ] && [ "${{ github.ref_name }}" != "" ]; then
+            if [ "${{ github.ref_name }}" == "main" ]; then
+              TYPE="release"
+            else
+              TYPE="${{ github.ref_name }}"
+            fi
           elif [ -n "${{ github.event.client_payload.type }}" ] && [ "${{ github.event.client_payload.type }}" != "" ]; then
             TYPE="${{ github.event.client_payload.type }}"
           else
@@ -60,7 +55,6 @@ jobs:
           if [ "${TYPE}" != "release" ]; then
             git checkout -b "${BRANCH}"
           fi
-          
 
       # Set up Node.js
       - name: Set up Node.js
