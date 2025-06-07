@@ -9,15 +9,36 @@ on:
     types: [ release-trigger ]
 
   workflow_dispatch:
+    inputs:
+      type:
+        description: 'Type of publication'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - test
 
 jobs:
   increment-build-release:
     runs-on: ubuntu-latest
 
     steps:
+        # Set environment variables based on the type of publication
+      - name: Set up environment variables
+        run: |
+          echo "type=${{ github.event.inputs.type || github.event.client_payload.type || 'release' }}" >> $GITHUB_ENV
+          if [ "${{ env.type }}" == 'release' ]; then
+            echo "branch=main" >> $GITHUB_ENV
+          else
+            echo "branch=${{ env.type }}" >> $GITHUB_ENV
+          fi
+
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.branch }}
 
       # Check if a releases exists
       - name: Check for existing releases
@@ -39,7 +60,6 @@ jobs:
         run: |
           corepack enable
           yarn
-          yarn info
 
       # Build the project
       - name: Build the project
@@ -61,10 +81,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "filename=archive-${{ env.version }}.zip" >> $GITHUB_ENV
           mv .doc www
           mv .env env
-          zip -r archive-${{ env.version }}.zip www env -x "*.DS_Store"
-          gh release create ${{ env.version }} archive-${{ env.version }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
+          zip -r ${{ env.filename }} www env -x "*.DS_Store"
+          gh release create ${{ env.version }} ${{ env.filename }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
 
       # Increment the patch version in package.json
       - name: Increment patch version
@@ -78,6 +99,7 @@ jobs:
       # Commit the updated package.json
       - name: Commit updated version
         run: |
+          git checkout main
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add package.json

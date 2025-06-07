@@ -3,6 +3,14 @@ name: Collect and commit latest version
 on:
   workflow_dispatch:
     inputs:
+      type:
+        description: 'Type of publication'
+        required: true
+        default: release
+      branch:
+        description: 'Branch to collect from'
+        required: true
+        default: 'main'
       tag:
         description: 'Release tag'
         required: true
@@ -33,7 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: GouvernementFR/dsfr
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.branch }}
           path: dsfr
 
       # Checkout the dsfr-archive
@@ -54,7 +62,7 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          if [ env.major > 1 ]; then
+          if [ "${{ env.major }}" -gt 1 ]; then
             corepack enable
           fi          
           yarn install
@@ -75,6 +83,9 @@ jobs:
           if git show-ref --verify --quiet refs/heads/${{ env.branch }}; then
             echo "Branch ${{ env.branch }} already exists. Deleting it."
             git branch -D ${{ env.branch }}
+            if git ls-remote --exit-code --heads origin "${{ env.branch }}"; then
+              git push origin --delete "${{ env.branch }}"
+            fi
           fi
           # Create a new branch
           git checkout -b ${{ env.branch }}
@@ -100,6 +111,15 @@ jobs:
           # merge the branch into the main branch squash
           git checkout main
           git merge --squash ${{ env.branch }}
+          if [ "${{ inputs.type }}" != "release" ]; then
+            if git show-ref --verify --quiet refs/heads/"${{ inputs.type }}"; then
+              git branch -D "${{ inputs.type }}"
+            fi
+            if git ls-remote --exit-code --heads origin "${{ inputs.type }}"; then
+              git push origin --delete "${{ inputs.type }}"
+            fi
+            git checkout -b "${{ inputs.type }}"
+          fi
           git commit -m "🚚 chore: collected DSFR release ${{ inputs.tag }}"
           git push
         working-directory: archive
@@ -113,4 +133,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               event_type: 'release-trigger',
+                client_payload: {
+                    type: '${{ inputs.type }}',
+                    branch: '${{ inputs.branch }}',
+                    tag: '${{ inputs.tag }}'
+                }
             });
