@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
@@ -32,24 +36,15 @@ jobs:
             echo "BRANCH=main" >> $GITHUB_ENV
           else
             echo "BRANCH=${TYPE}" >> $GITHUB_ENV
+            git checkout -b "${TYPE}"
           fi
-
-      # Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH }}
-
-      # Check if a releases exists
-      - name: Check for existing releases
-        run: |
           if [ ! -d "releases" ]; then
               echo "Releases directory does not exist or is empty."
               exit 1
           fi
           LATEST_TAG=$(git describe --tags --abbrev=0)
           VERSION=${LATEST_TAG#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${VERSION}"
           PATCH=$((PATCH + 1))
           TAG="v$MAJOR.$MINOR.$PATCH"
           echo "TAG=$TAG" >> $GITHUB_ENV
