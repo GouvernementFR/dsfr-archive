@@ -31,12 +31,19 @@ jobs:
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
-          echo "TYPE=${{ github.event.inputs.type || github.event.client_payload.type || 'release' }}" >> $GITHUB_ENV
-          if [ "${TYPE}" == 'release' ]; then
-            echo "BRANCH=main" >> $GITHUB_ENV
+          if [ -n "${{ github.event.inputs.type }}" ]; then
+            TYPE="${{ github.event.inputs.type }}"
+          elif [ -n "${{ github.event.client_payload.type }}" ]; then
+            TYPE="${{ github.event.client_payload.type }}"
           else
+            TYPE="release"
+          fi
+          echo "TYPE=$TYPE" >> $GITHUB_ENV
+          if [ "${TYPE}" != 'release' ]; then
             echo "BRANCH=${TYPE}" >> $GITHUB_ENV
-            git checkout -b "${TYPE}"
+            git checkout -b "${BRANCH}"
+          else
+            echo "BRANCH=main" >> $GITHUB_ENV
           fi
           if [ ! -d "releases" ]; then
               echo "Releases directory does not exist or is empty."
@@ -49,7 +56,7 @@ jobs:
           TAG="v$MAJOR.$MINOR.$PATCH"
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "RELEASE=${TAG}-${TYPE}" >> $GITHUB_ENV
-          echo "FILENAME=archive-${RELEASE}.zip" >> $GITHUB_ENV
+          echo "FILE=archive-${RELEASE}.zip" >> $GITHUB_ENV
 
       # Set up Node.js
       - name: Set up Node.js
@@ -78,5 +85,5 @@ jobs:
           
           mv .doc www
           mv .env env
-          zip -r ${{ env.FILENAME }} www env -x "*.DS_Store"
-          gh release create ${{ env.TAG }} ${{ env.FILENAME }} --title "Release ${{ env.TAG }}" --notes "Automated release for version ${{ env.TAG }}"
+          zip -r ${{ env.FILE }} www env -x "*.DS_Store"
+          gh release create ${{ env.TAG }} ${{ env.FILE }} --title "Release ${{ env.TAG }}" --notes "Automated release for version ${{ env.TAG }}"
