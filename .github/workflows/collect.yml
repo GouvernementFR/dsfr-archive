@@ -21,20 +21,24 @@ jobs:
 
     steps:
       # Check if the tag is >= v1.14.0 and create environment variables
-      - name: Check tag version
-        id: check_version
+      - name: Check tag version & set environment variables
         run: |
-          version=${{ inputs.tag }}
-          if [ "$(printf '%s\n' "v1.14.0" "$version" | sort -V | head -n1)" != "v1.14.0" ]; then
+          TAG=${{ inputs.tag }}
+          if [ "$(printf '%s\n' "v1.14.0" "$TAG" | sort -V | head -n1)" != "v1.14.0" ]; then
             echo "Tag is less than v1.14.0. Exiting."
             exit 1
           fi
-          dest="releases/${{ inputs.tag }}"
-          echo "dest=$dest" >> $GITHUB_ENV
-          major=$(echo "$version" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
-          echo "major=$major" >> $GITHUB_ENV
-          branch="collect/${{ inputs.tag }}"
-          echo "branch=$branch" >> $GITHUB_ENV
+          DEST="releases/${{ inputs.tag }}"
+          echo "DEST=$DEST" >> $GITHUB_ENV
+          MAJOR=$(echo "$TAG" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          COLLECT="collect/${{ inputs.tag }}"
+          echo "COLLECT=$COLLECT" >> $GITHUB_ENV
+          if [ "${{ inputs.type }}" == "release" ]; then
+            echo "BRANCH=main" >> $GITHUB_ENV
+          else
+            echo "BRANCH=${{ inputs.type }}" >> $GITHUB_ENV
+          fi
 
       # Checkout the dsfr repository
       - name: Checkout dsfr
@@ -62,7 +66,7 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          if [ "${{ env.major }}" -gt 1 ]; then
+          if [ "${{ env.MAJOR }}" -gt 1 ]; then
             corepack enable
           fi          
           yarn install
@@ -80,17 +84,17 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           # Check if the branch already exists
-          if git show-ref --verify --quiet refs/heads/${{ env.branch }}; then
-            echo "Branch ${{ env.branch }} already exists. Deleting it."
-            git branch -D ${{ env.branch }}
-            if git ls-remote --exit-code --heads origin "${{ env.branch }}"; then
-              git push origin --delete "${{ env.branch }}"
+          if git show-ref --verify --quiet refs/heads/${{ env.COLLECT }}; then
+            echo "Branch ${{ env.COLLECT }} already exists. Deleting it."
+            git branch -D ${{ env.COLLECT }}
+            if git ls-remote --exit-code --heads origin "${{ env.COLLECT }}"; then
+              git push origin --delete "${{ env.COLLECT }}"
             fi
           fi
           # Create a new branch
-          git checkout -b ${{ env.branch }}
-          if [ -d "${{ env.dest }}" ]; then
-            git rm -r --ignore-unmatch ${{ env.dest }}
+          git checkout -b ${{ env.COLLECT }}
+          if [ -d "${{ env.DEST }}" ]; then
+            git rm -r --ignore-unmatch ${{ env.DEST }}
             git commit -m "remove existing release folder"
           fi
         working-directory: archive
@@ -98,8 +102,8 @@ jobs:
       # Copy archive files to the destination folder
       - name: Copy files to folder
         run: |
-          mkdir -p archive/${{ env.dest }}
-          cp -r dsfr/.archive/* archive/${{ env.dest }}
+          mkdir -p archive/${{ env.DEST }}
+          cp -r dsfr/.archive/* archive/${{ env.DEST }}
 
       # Commit and push changes to the branch
       - name: Commit and push release
@@ -110,18 +114,18 @@ jobs:
           git commit -m "add release files for ${{ inputs.tag }}"
           # merge the branch into the main branch squash
           git checkout main
-          git merge --squash ${{ env.branch }}
+          git merge --squash ${{ env.COLLECT }}
           if [ "${{ inputs.type }}" != "release" ]; then
-            if git show-ref --verify --quiet refs/heads/"${{ inputs.type }}"; then
-              git branch -D "${{ inputs.type }}"
+            if git show-ref --verify --quiet refs/heads/"${{ env.BRANCH }}"; then
+              git branch -D "${{ env.BRANCH }}"
             fi
-            if git ls-remote --exit-code --heads origin "${{ inputs.type }}"; then
-              git push origin --delete "${{ inputs.type }}"
+            if git ls-remote --exit-code --heads origin "${{ env.BRANCH }}"; then
+              git push origin --delete "${{ env.BRANCH }}"
             fi
-            git checkout -b "${{ inputs.type }}"
+            git checkout -b "${{ env.BRANCH }}"
           fi
           git commit -m "🚚 chore: collected DSFR release ${{ inputs.tag }}"
-          git push
+          git push --set-upstream origin "${{ env.BRANCH }}"
         working-directory: archive
 
       # Trigger the release workflow
@@ -135,7 +139,7 @@ jobs:
               event_type: 'release-trigger',
                 client_payload: {
                     type: '${{ inputs.type }}',
-                    branch: '${{ inputs.branch }}',
+                    branch: '${{ env.BRANCH }}',
                     tag: '${{ inputs.tag }}'
                 }
             });

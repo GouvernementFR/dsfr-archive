@@ -27,18 +27,21 @@ jobs:
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
-          echo "type=${{ github.event.inputs.type || github.event.client_payload.type || 'release' }}" >> $GITHUB_ENV
-          if [ "${{ env.type }}" == 'release' ]; then
-            echo "branch=main" >> $GITHUB_ENV
+          echo "TYPE=${{ github.event.inputs.type || github.event.client_payload.type || 'release' }}" >> $GITHUB_ENV
+          if [ "${TYPE}" == 'release' ]; then
+            echo "BRANCH=main" >> $GITHUB_ENV
           else
-            echo "branch=${{ env.type }}" >> $GITHUB_ENV
+            echo "BRANCH=${TYPE}" >> $GITHUB_ENV
           fi
+          TIMESTAMP=$(date +"%Y%m%d-%H%M")
+          echo "RELEASE=${TIMESTAMP}-${TYPE}" >> $GITHUB_ENV
+          echo "FILENAME=archive-${RELEASE}.zip" >> $GITHUB_ENV
 
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.branch }}
+          ref: ${{ env.BRANCH }}
 
       # Check if a releases exists
       - name: Check for existing releases
@@ -68,40 +71,13 @@ jobs:
           yarn dsfr interpret
           yarn dsfr publish
 
-      # Extract the current version from package.json
-      - name: Extract current version
-        id: extract_version
-        run: |
-          current_version=$(jq -r '.version' package.json)
-          echo "Current version: $current_version"
-          echo "version=$current_version" >> $GITHUB_ENV
-
       # Perform the release using the current version
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "filename=archive-${{ env.version }}.zip" >> $GITHUB_ENV
+          
           mv .doc www
           mv .env env
-          zip -r ${{ env.filename }} www env -x "*.DS_Store"
-          gh release create ${{ env.version }} ${{ env.filename }}.zip --title "Release ${{ env.version }}" --notes "Automated release for version ${{ env.version }}"
-
-      # Increment the patch version in package.json
-      - name: Increment patch version
-        run: |
-          current_version=$(jq -r '.version' package.json)
-          new_version=$(echo $current_version | awk -F. '{print $1"."$2"."$3+1}')
-          jq ".version = \"$new_version\"" package.json > package.tmp.json && mv package.tmp.json package.json
-          echo "New version: $new_version"
-          echo "version=$new_version" >> $GITHUB_ENV
-
-      # Commit the updated package.json
-      - name: Commit updated version
-        run: |
-          git checkout main
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add package.json
-          git commit -m "Increment version to ${{ env.version }}"
-          git push
+          zip -r ${{ env.FILENAME }} www env -x "*.DS_Store"
+          gh release create ${{ env.RELEASE }} ${{ env.FILENAME }} --title "Release ${{ env.RELEASE }}" --notes "Automated release created by GitHub Actions"
