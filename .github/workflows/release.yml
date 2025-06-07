@@ -33,9 +33,6 @@ jobs:
           else
             echo "BRANCH=${TYPE}" >> $GITHUB_ENV
           fi
-          TIMESTAMP=$(date +"%Y%m%d-%H%M")
-          echo "RELEASE=${TIMESTAMP}-${TYPE}" >> $GITHUB_ENV
-          echo "FILENAME=archive-${RELEASE}.zip" >> $GITHUB_ENV
 
       # Checkout the repository
       - name: Checkout repository
@@ -45,12 +42,19 @@ jobs:
 
       # Check if a releases exists
       - name: Check for existing releases
-        id: check_release
         run: |
           if [ ! -d "releases" ]; then
               echo "Releases directory does not exist or is empty."
               exit 1
           fi
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          VERSION=${LATEST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          PATCH=$((PATCH + 1))
+          TAG="v$MAJOR.$MINOR.$PATCH"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "RELEASE=${TAG}-${TYPE}" >> $GITHUB_ENV
+          echo "FILENAME=archive-${RELEASE}.zip" >> $GITHUB_ENV
 
       # Set up Node.js
       - name: Set up Node.js
@@ -80,4 +84,4 @@ jobs:
           mv .doc www
           mv .env env
           zip -r ${{ env.FILENAME }} www env -x "*.DS_Store"
-          gh release create ${{ env.RELEASE }} ${{ env.FILENAME }} --title "Release ${{ env.RELEASE }}" --notes "Automated release created by GitHub Actions"
+          gh release create ${{ env.TAG }} ${{ env.FILENAME }} --title "Release ${{ env.TAG }}" --notes "Automated release for version ${{ env.TAG }}"
