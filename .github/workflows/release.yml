@@ -31,9 +31,9 @@ jobs:
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
-          if [ -n "${{ github.event.inputs.type }}" ]; then
+          if [ -n "${{ github.event.inputs.type }}" ] && [ "${{ github.event.inputs.type }}" != "" ]; then
             TYPE="${{ github.event.inputs.type }}"
-          elif [ -n "${{ github.event.client_payload.type }}" ]; then
+          elif [ -n "${{ github.event.client_payload.type }}" ] && [ "${{ github.event.client_payload.type }}" != "" ]; then
             TYPE="${{ github.event.client_payload.type }}"
           else
             TYPE="release"
