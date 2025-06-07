@@ -95,13 +95,13 @@ jobs:
           fi
         working-directory: archive
 
-      # Use the environment variable in subsequent steps
-      - name: Copy files to temp folder
+      # Copy archive files to the destination folder
+      - name: Copy files to folder
         run: |
           mkdir -p archive/${{ env.dest }}
           cp -r dsfr/.archive/* archive/${{ env.dest }}
 
-      # Commit and push changes
+      # Commit and push changes to the branch
       - name: Commit and push release
         run: |
           git config user.name "GitHub Actions"
@@ -125,7 +125,7 @@ jobs:
         working-directory: archive
 
       # Trigger the release workflow
-      - name: Trigger Release Workflow
+      - name: Trigger release workflow
         uses: actions/github-script@v7
         with:
           script: |

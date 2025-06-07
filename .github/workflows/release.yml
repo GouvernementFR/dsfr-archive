@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        # Set environment variables based on the type of publication
+      # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
           echo "type=${{ github.event.inputs.type || github.event.client_payload.type || 'release' }}" >> $GITHUB_ENV
