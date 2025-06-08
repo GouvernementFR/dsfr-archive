@@ -43,7 +43,7 @@ jobs:
             echo "type is not release, using branch $TYPE"
           else
             echo "BRANCH=main" >> $GITHUB_ENV
-            echo "type is release, using branch main"
+            echo "type is release, using branch $BRANCH"
           fi
           git fetch --tags
           LATEST_TAG=$(git tag --sort=-creatordate | head -n1)
