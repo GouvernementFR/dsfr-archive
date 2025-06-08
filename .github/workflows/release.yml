@@ -1,4 +1,4 @@
-name: Build, release and Increment version
+name: Build and release
 
 on:
   push:
@@ -63,9 +63,22 @@ jobs:
           echo "TAG: $TAG"
           echo "RELEASE: $RELEASE"
           echo "FILE: $FILE"
-          if [ "$TYPE" != "release" ]; then
-            git checkout -b "$BRANCH"
+          if [ ! -d "releases" ]; then
+            echo "Releases directory does not exist or is empty."
+            exit 1
           fi
+
+      # Checkout branch
+      - name: Checkout repository
+        if: BRANCH != 'main'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+          fetch-depth: 0
+
+      # Check if releases directory exists
+      - name: Check releases exists
+        run: |
           if [ ! -d "releases" ]; then
             echo "Releases directory does not exist or is empty."
             exit 1

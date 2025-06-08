@@ -23,22 +23,24 @@ jobs:
       # Check if the tag is >= v1.14.0 and create environment variables
       - name: Check tag version & set environment variables
         run: |
-          TAG=${{ inputs.tag }}
+          export TAG=${{ inputs.tag }}
           if [ "$(printf '%s\n' "v1.14.0" "$TAG" | sort -V | head -n1)" != "v1.14.0" ]; then
             echo "Tag is less than v1.14.0. Exiting."
             exit 1
           fi
-          DEST="releases/${{ inputs.tag }}"
-          echo "DEST=$DEST" >> $GITHUB_ENV
-          MAJOR=$(echo "$TAG" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
-          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-          COLLECT="collect/${{ inputs.tag }}"
-          echo "COLLECT=$COLLECT" >> $GITHUB_ENV
+          export DEST="releases/${{ inputs.tag }}"
+          export MAJOR=$(echo "$TAG" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
+          export COLLECT="collect/${{ inputs.tag }}"
           if [ "${{ inputs.type }}" == "release" ]; then
-            echo "BRANCH=main" >> $GITHUB_ENV
+            export BRANCH="main"
           else
-            echo "BRANCH=${{ inputs.type }}" >> $GITHUB_ENV
+            export BRANCH="${{ inputs.type }}"
           fi
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "DEST=$DEST" >> $GITHUB_ENV
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "COLLECT=$COLLECT" >> $GITHUB_ENV
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       # Checkout the dsfr repository
       - name: Checkout dsfr
