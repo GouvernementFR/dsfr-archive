@@ -52,6 +52,11 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "RELEASE=$TAG-$TYPE" >> $GITHUB_ENV
           echo "FILE=archive-$RELEASE.zip" >> $GITHUB_ENV
+          echo "TYPE: $TYPE"
+          echo "BRANCH: $BRANCH"
+          echo "TAG: $TAG"
+          echo "RELEASE: $RELEASE"
+          echo "FILE: $FILE"
           if [ "$TYPE" != "release" ]; then
             git checkout -b "$BRANCH"
           fi
