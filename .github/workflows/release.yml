@@ -63,14 +63,10 @@ jobs:
           echo "TAG: $TAG"
           echo "RELEASE: $RELEASE"
           echo "FILE: $FILE"
-          if [ ! -d "releases" ]; then
-            echo "Releases directory does not exist or is empty."
-            exit 1
-          fi
 
-      # Checkout branch
+      # Checkout specific branch if not main
       - name: Checkout repository
-        if: BRANCH != 'main'
+        if: ${{ env.BRANCH != 'main' }}
         uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH }}
