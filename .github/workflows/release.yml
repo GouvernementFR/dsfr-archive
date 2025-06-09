@@ -17,6 +17,8 @@ jobs:
     steps:
       # Set environment variables based on the type of publication
       - name: Set up environment variables
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             if [ -n "${{ github.ref_name }}" ] && [ "${{ github.ref_name }}" != "" ] && [ "${{ github.ref_name }}" != "main" ]; then
