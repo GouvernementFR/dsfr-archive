@@ -15,10 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       # Set environment variables based on the type of publication
       - name: Set up environment variables
         run: |
@@ -37,7 +33,6 @@ jobs:
           else
             export TYPE="release"
           fi
-          echo "TYPE=$TYPE" >> $GITHUB_ENV
           if [ "$TYPE" != "release" ]; then
             export BRANCH="$TYPE"
             echo "type is not release, using branch $TYPE"
@@ -45,28 +40,31 @@ jobs:
             export BRANCH="main"
             echo "type is release, using branch $BRANCH"
           fi
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          git fetch --tags
-          export LATEST_TAG=$(git tag --sort=-creatordate | head -n1)
+          export LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
           echo "latest tag: $LATEST_TAG"
-          export VERSION=${LATEST_TAG#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          PATCH=$((PATCH + 1))
-          export TAG="v$MAJOR.$MINOR.$PATCH"
+          if [ -z "$LATEST_TAG" ]; then
+            export TAG="v1.0.0"
+          else
+            export VERSION=${LATEST_TAG#v}
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            PATCH=$((PATCH + 1))
+            export TAG="v$MAJOR.$MINOR.$PATCH"
+          fi
           export RELEASE="${TAG}-${TYPE}"
           export FILE="archive-${RELEASE}.zip"
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
-          echo "FILE=$FILE" >> $GITHUB_ENV
           echo "TYPE: $TYPE"
           echo "BRANCH: $BRANCH"
           echo "TAG: $TAG"
           echo "RELEASE: $RELEASE"
           echo "FILE: $FILE"
+          echo "TYPE=$TYPE" >> $GITHUB_ENV
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "FILE=$FILE" >> $GITHUB_ENV
 
       # Checkout specific branch if not main
       - name: Checkout repository
-        if: env.BRANCH != 'main'
         uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH }}
