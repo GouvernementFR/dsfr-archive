@@ -41,20 +41,22 @@ jobs:
           fi
           if [ "$TYPE" != "release" ]; then
             export BRANCH="$TYPE"
+            export APPENDIX="-rc"
             echo "type is not release, using branch $TYPE"
           else
             export BRANCH="main"
+            export APPENDIX=""
             echo "type is release, using branch $BRANCH"
           fi
           export LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
           echo "latest tag: $LATEST_TAG"
           if [ -z "$LATEST_TAG" ]; then
-            export TAG="v1.0.0"
+            export TAG="v1.0.0$APPENDIX"
           else
             export VERSION=${LATEST_TAG#v}
             IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
             PATCH=$((PATCH + 1))
-            export TAG="v$MAJOR.$MINOR.$PATCH"
+            export TAG="v$MAJOR.$MINOR.$PATCH$APPENDIX"
           fi
           export RELEASE="${TAG}-${TYPE}"
           export FILE="archive-${RELEASE}.zip"
