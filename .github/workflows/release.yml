@@ -66,7 +66,6 @@ jobs:
           echo "TYPE=$TYPE" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "FILE=$FILE" >> $GITHUB_ENV
 
       # Checkout specific branch if not main
@@ -82,23 +81,30 @@ jobs:
         run: |
           if [ ! -d "releases" ]; then
             echo "Releases directory does not exist or is empty. No release needed."
-            exit 0
+            export RELEASING=false
+          else
+            echo "Releases directory exists. Proceeding with release."
+            export RELEASING=true
           fi
+          echo "RELEASING=$RELEASING" >> $GITHUB_ENV
 
       # Set up Node.js
       - name: Set up Node.js
+        if: env.RELEASING == 'true'
         uses: actions/setup-node@v3
         with:
           node-version: '22.14.0'
 
       # Enable corepack
       - name: Enable corepack
+        if: env.RELEASING == 'true'
         run: |
           corepack enable
           yarn
 
       # Build the project
       - name: Build the project
+        if: env.RELEASING == 'true'
         run: |
           yarn dsfr configure
           yarn dsfr interpret
@@ -106,6 +112,7 @@ jobs:
 
       # Perform the release using the current version
       - name: Create GitHub release
+        if: env.RELEASING == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
