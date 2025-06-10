@@ -24,6 +24,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Determine TYPE based on the event type
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             if [ -n "${{ github.ref_name }}" ] && [ "${{ github.ref_name }}" != "" ] && [ "${{ github.ref_name }}" != "main" ]; then
               export TYPE="${{ github.ref_name }}"
@@ -39,36 +40,21 @@ jobs:
           else
             export TYPE="release"
           fi
+          
+          # Set BRANCH based on TYPE
           if [ "$TYPE" != "release" ]; then
             export BRANCH="$TYPE"
-            export APPENDIX="-rc"
             echo "type is not release, using branch $TYPE"
           else
             export BRANCH="main"
-            export APPENDIX=""
             echo "type is release, using branch $BRANCH"
           fi
-          export LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "latest tag: $LATEST_TAG"
-          if [ -z "$LATEST_TAG" ]; then
-            export TAG="v1.0.0$APPENDIX"
-          else
-            export VERSION=${LATEST_TAG#v}
-            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-            PATCH=$((PATCH + 1))
-            export TAG="v$MAJOR.$MINOR.$PATCH$APPENDIX"
-          fi
-          export RELEASE="${TAG}-${TYPE}"
-          export FILE="archive-${RELEASE}.zip"
+          
+          # Export variables to GitHub environment
           echo "TYPE: $TYPE"
           echo "BRANCH: $BRANCH"
-          echo "TAG: $TAG"
-          echo "RELEASE: $RELEASE"
-          echo "FILE: $FILE"
           echo "TYPE=$TYPE" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "FILE=$FILE" >> $GITHUB_ENV
 
       # Checkout specific branch if not main
       - name: Checkout repository
@@ -78,17 +64,48 @@ jobs:
           ref: ${{ env.BRANCH }}
           fetch-depth: 0
 
-      # Check if releases directory exists
-      - name: Check releases exists
+      # Check if releases directory exists and determine tag
+      - name: get tag
         run: |
           if [ ! -d "releases" ]; then
             echo "Releases directory does not exist or is empty. No release needed."
             export RELEASING=false
           else
-            echo "Releases directory exists. Proceeding with release."
             export RELEASING=true
           fi
+          
+          # Get all version folder names, sort, and pick the highest
+          export HIGHEST_VERSION=$(ls releases | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$' | sort -V | tail -n1)
+          if [ -z "$HIGHEST_VERSION" ]; then
+            export HIGHEST_VERSION="v1.0.0"
+          fi
+
+          # Determine type and appendix
+          if [ "$TYPE" = "release" ]; then
+            export BASE_TAG="$HIGHEST_VERSION"
+          else
+            export BASE_TAG="${HIGHEST_VERSION}-${{ env.TYPE }}"
+          fi
+      
+          # Find existing tags with +build.# and increment
+          export EXISTING_TAGS=$(git tag --list "${BASE_TAG}+build.*")
+          if [ -z "$EXISTING_TAGS" ]; then
+            export BUILD_NUM=1
+          else
+            BUILD_NUM=$(echo "$EXISTING_TAGS" | sed -E "s/.*\+build\.([0-9]+)$/\1/" | sort -n | tail -n1)
+            export BUILD_NUM=$((BUILD_NUM + 1))
+          fi
+      
+          # Set the final tag and file name
+          export TAG="${BASE_TAG}+build.${BUILD_NUM}"
+          export FILE="archive-${TAG}.zip"
+          
+          # Export variables to GitHub environment
+          echo "TAG: $TAG"
+          echo "FILE: $FILE"
           echo "RELEASING=$RELEASING" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "FILE=$FILE" >> $GITHUB_ENV
 
       # Set up Node.js
       - name: Set up Node.js
