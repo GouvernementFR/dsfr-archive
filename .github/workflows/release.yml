@@ -81,8 +81,8 @@ jobs:
       - name: Check releases exists
         run: |
           if [ ! -d "releases" ]; then
-            echo "Releases directory does not exist or is empty."
-            exit 1
+            echo "Releases directory does not exist or is empty. No release needed."
+            exit 0
           fi
 
       # Set up Node.js
