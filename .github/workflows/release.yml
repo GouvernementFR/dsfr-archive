@@ -125,7 +125,7 @@ jobs:
       - name: Build the project
         if: env.RELEASING == 'true'
         run: |
-          yarn list --pattern @gouvfr/dsfr-nexus
+          yarn info @gouvfr/dsfr-nexus version
           yarn dsfr configure
           yarn dsfr interpret
           yarn dsfr publish
