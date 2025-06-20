@@ -82,9 +82,9 @@ jobs:
 
           # Determine type and appendix
           if [ "$TYPE" = "release" ]; then
-            export BASE_TAG="${HIGHEST_VERSION}@prod"
+            export BASE_TAG="${HIGHEST_VERSION}--prod"
           else
-            export BASE_TAG="${HIGHEST_VERSION}-${{ env.TYPE }}"
+            export BASE_TAG="${HIGHEST_VERSION}--${{ env.TYPE }}"
           fi
       
           # Find existing tags with +build.# and increment
