@@ -82,7 +82,7 @@ jobs:
 
           # Determine type and appendix
           if [ "$TYPE" = "release" ]; then
-            export BASE_TAG="${HIGHEST_VERSION}@production"
+            export BASE_TAG="${HIGHEST_VERSION}@prod"
           else
             export BASE_TAG="${HIGHEST_VERSION}-${{ env.TYPE }}"
           fi
