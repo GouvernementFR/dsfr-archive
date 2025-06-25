@@ -89,10 +89,13 @@ jobs:
       
           # Find existing tags with +build.# and increment
           export EXISTING_TAGS=$(git tag --list "${BASE_TAG}+build.*")
+          echo "Existing tags: $EXISTING_TAGS"  
           if [ -z "$EXISTING_TAGS" ]; then
+            echo "No existing tags found for ${BASE_TAG}+build.*"
             export BUILD_NUM=1
           else
             BUILD_NUM=$(echo "$EXISTING_TAGS" | sed -E "s/.*\+build\.([0-9]+)$/\1/" | sort -n | tail -n1)
+          echo "Current build number: $BUILD_NUM"
             export BUILD_NUM=$((BUILD_NUM + 1))
           fi
       
