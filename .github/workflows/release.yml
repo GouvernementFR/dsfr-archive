@@ -18,6 +18,8 @@ jobs:
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Set environment variables based on the type of publication
       - name: Set up environment variables
