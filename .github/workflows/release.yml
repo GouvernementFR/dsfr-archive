@@ -130,7 +130,7 @@ jobs:
       - name: Build the project
         if: env.RELEASING == 'true'
         run: |
-          yarn up @gouvfr/dsfr-nexus
+          
           yarn info @gouvfr/dsfr-nexus version
           yarn dsfr configure
           yarn dsfr interpret
