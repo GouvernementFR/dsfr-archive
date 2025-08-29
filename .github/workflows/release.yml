@@ -57,11 +57,17 @@ jobs:
             echo "type is release, using branch $BRANCH"
           fi
           
+          #
+          if [ -n "${{ github.event.client_payload.nexus_version }}" ] && [ "${{ github.event.client_payload.nexus_version }}" != "" ]; then
+            export NEXUS_VERSION="${{ github.event.client_payload.nexus_version }}"
+          fi
+          
           # Export variables to GitHub environment
           echo "TYPE: $TYPE"
           echo "BRANCH: $BRANCH"
           echo "TYPE=$TYPE" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "NEXUS_VERSION=$NEXUS_VERSION" >> $GITHUB_ENV
 
       # Checkout specific branch if not main
       - name: Checkout repository
@@ -135,9 +141,11 @@ jobs:
       - name: Build the project
         if: env.RELEASING == 'true'
         run: |
-          if [ -n "${{ github.event.client_payload.nexus_version }}" ] && [ "${{ github.event.client_payload.nexus_version }}" != "" ]; then
-            export NEXUS_VERSION="${{ github.event.client_payload.nexus_version }}"
-            yarn up @gouvfr/dsfr-nexus@"$NEXUS_VERSION"
+          if [ -n "${{ env.NEXUS_VERSION }}" ] && [ "${{ env.NEXUS_VERSION }}" != "" ]; then
+            echo "Using specified Nexus version: $NEXUS_VERSION"
+            yarn add @gouvfr/dsfr-nexus@$NEXUS_VERSION
+          else
+            echo "No specific Nexus version provided, using the latest version."
           fi
           yarn info @gouvfr/dsfr-nexus version
           yarn dsfr configure
