@@ -9,6 +9,11 @@ on:
     types: [ release-trigger ]
 
   workflow_dispatch:
+    inputs:
+      nexus_version:
+        description: 'Version of Nexus to use in the release (e.g., v1.0.0)'
+        required: false
+        default: ''
 
 jobs:
   increment-build-release:
@@ -130,7 +135,10 @@ jobs:
       - name: Build the project
         if: env.RELEASING == 'true'
         run: |
-          
+          if [ -n "${{ github.event.client_payload.nexus_version }}" ] && [ "${{ github.event.client_payload.nexus_version }}" != "" ]; then
+            export NEXUS_VERSION="${{ github.event.client_payload.nexus_version }}"
+            yarn up @gouvfr/dsfr-nexus@"$NEXUS_VERSION"
+          fi
           yarn info @gouvfr/dsfr-nexus version
           yarn dsfr configure
           yarn dsfr interpret
