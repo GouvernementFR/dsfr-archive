@@ -58,8 +58,8 @@ jobs:
           fi
           
           #
-          if [ -n "${{ github.event.client_payload.nexus_version }}" ] && [ "${{ github.event.client_payload.nexus_version }}" != "" ]; then
-            export NEXUS_VERSION="${{ github.event.client_payload.nexus_version }}"
+          if [ -n "${{ github.event.inputs.nexus_version }}" ] && [ "${{ github.event.inputs.nexus_version }}" != "" ]; then
+            export NEXUS_VERSION="${{ github.event.inputs.nexus_version }}"
           fi
           
           # Export variables to GitHub environment
