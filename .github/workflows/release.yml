@@ -129,13 +129,12 @@ jobs:
         if: env.RELEASING == 'true'
         run: |
           corepack enable
-          yarn
+          yarn install --no-immutable
 
       # Build the project
       - name: Build the project
         if: env.RELEASING == 'true'
         run: |
-          yarn install --no-immutable
           if [ -n "${{ github.event.client_payload.nexus_version }}" ] && [ "${{ github.event.client_payload.nexus_version }}" != "" ]; then
             export NEXUS_VERSION="${{ github.event.client_payload.nexus_version }}"
             yarn up @gouvfr/dsfr-nexus@"$NEXUS_VERSION"
