@@ -20,21 +20,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Validate inputs
+      - name: Validate inputs
+        env:
+          TAG: ${{ inputs.tag }}
+          BRANCH: ${{ inputs.branch }}
+          TYPE: ${{ inputs.type }}
+        run: |
+          # type must be in the whitelist
+          ALLOWED_TYPES=("release" "test")
+          if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
+            echo "Invalid TYPE: '$TYPE'. Allowed values: ${ALLOWED_TYPES[*]}"
+            exit 1
+          fi
+
+          # tag must match vX.Y.Z optionally followed by -suffix
+          if ! echo "$TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?$'; then
+            echo "Invalid TAG format: $TAG"
+            exit 1
+          fi
+
+          # branch must be alphanumeric with hyphens/slashes only
+          if ! echo "$BRANCH" | grep -qE '^[a-zA-Z0-9._/-]+$'; then
+            echo "Invalid BRANCH format: $BRANCH"
+            exit 1
+          fi
+
       # Check if the tag is >= v1.14.0 and create environment variables
       - name: Check tag version & set environment variables
+        env:
+          TAG: ${{ inputs.tag }}
+          INPUT_TYPE: ${{ inputs.type }}
         run: |
-          export TAG=${{ inputs.tag }}
           if [ "$(printf '%s\n' "v1.14.0" "$TAG" | sort -V | head -n1)" != "v1.14.0" ]; then
             echo "Tag is less than v1.14.0. Exiting."
             exit 1
           fi
-          export DEST="releases/${{ inputs.tag }}"
-          export MAJOR=$(echo "$TAG" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
-          export COLLECT="collect/${{ inputs.tag }}"
-          if [ "${{ inputs.type }}" == "release" ]; then
-            export BRANCH="main"
+          DEST="releases/$TAG"
+          MAJOR=$(echo "$TAG" | cut -d'.' -f1 | sed 's/v//' | awk '{print $1 + 0}')
+          COLLECT="collect/$TAG"
+          if [ "$INPUT_TYPE" == "release" ]; then
+            BRANCH="main"
           else
-            export BRANCH="${{ inputs.type }}"
+            BRANCH="$INPUT_TYPE"
           fi
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "DEST=$DEST" >> $GITHUB_ENV
@@ -42,7 +70,6 @@ jobs:
           echo "COLLECT=$COLLECT" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      # Checkout the dsfr repository
       - name: Checkout dsfr
         uses: actions/checkout@v4
         with:
@@ -50,7 +77,6 @@ jobs:
           ref: ${{ inputs.branch }}
           path: dsfr
 
-      # Checkout the dsfr-archive
       - name: Checkout dsfr-archive
         uses: actions/checkout@v4
         with:
@@ -67,10 +93,12 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
+        env:
+          MAJOR: ${{ env.MAJOR }}
         run: |
-          if [ "${{ env.MAJOR }}" -gt 1 ]; then
+          if [ "$MAJOR" -gt 1 ]; then
             corepack enable
-          fi          
+          fi
           yarn install
         working-directory: dsfr
         continue-on-error: false
@@ -82,66 +110,75 @@ jobs:
 
       # Create branch and remove existing release folder if it exists
       - name: Remove existing release folder
+        env:
+          COLLECT: ${{ env.COLLECT }}
+          DEST: ${{ env.DEST }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          # Check if the branch already exists
-          if git show-ref --verify --quiet refs/heads/${{ env.COLLECT }}; then
-            echo "Branch ${{ env.COLLECT }} already exists. Deleting it."
-            git branch -D ${{ env.COLLECT }}
-            if git ls-remote --exit-code --heads origin "${{ env.COLLECT }}"; then
-              git push origin --delete "${{ env.COLLECT }}"
+          if git show-ref --verify --quiet "refs/heads/$COLLECT"; then
+            echo "Branch $COLLECT already exists. Deleting it."
+            git branch -D "$COLLECT"
+            if git ls-remote --exit-code --heads origin "$COLLECT"; then
+              git push origin --delete "$COLLECT"
             fi
           fi
-          # Create a new branch
-          git checkout -b ${{ env.COLLECT }}
-          if [ -d "${{ env.DEST }}" ]; then
-            git rm -r --ignore-unmatch ${{ env.DEST }}
+          git checkout -b "$COLLECT"
+          if [ -d "$DEST" ]; then
+            git rm -r --ignore-unmatch "$DEST"
             git commit -m "remove existing release folder"
           fi
         working-directory: archive
 
       # Copy archive files to the destination folder
       - name: Copy files to folder
+        env:
+          DEST: ${{ env.DEST }}
         run: |
-          mkdir -p archive/${{ env.DEST }}
-          cp -r dsfr/.archive/* archive/${{ env.DEST }}
+          mkdir -p "archive/$DEST"
+          cp -r dsfr/.archive/* "archive/$DEST"
 
-      # Commit and push changes to the branch
       - name: Commit and push release
+        env:
+          TAG: ${{ env.TAG }}
+          COLLECT: ${{ env.COLLECT }}
+          BRANCH: ${{ env.BRANCH }}
+          INPUT_TYPE: ${{ inputs.type }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "add release files for ${{ inputs.tag }}"
-          # merge the branch into the main branch squash
+          git commit -m "add release files for $TAG"
           git checkout main
-          git merge --squash ${{ env.COLLECT }}
-          if [ "${{ inputs.type }}" != "release" ]; then
-            if git show-ref --verify --quiet refs/heads/"${{ env.BRANCH }}"; then
-              git branch -D "${{ env.BRANCH }}"
+          git merge --squash "$COLLECT"
+          if [ "$INPUT_TYPE" != "release" ]; then
+            if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+              git branch -D "$BRANCH"
             fi
-            if git ls-remote --exit-code --heads origin "${{ env.BRANCH }}"; then
-              git push origin --delete "${{ env.BRANCH }}"
+            if git ls-remote --exit-code --heads origin "$BRANCH"; then
+              git push origin --delete "$BRANCH"
             fi
-            git checkout -b "${{ env.BRANCH }}"
+            git checkout -b "$BRANCH"
           fi
-          git commit -m "🚚 chore: collected DSFR release ${{ inputs.tag }}"
-          git push --set-upstream origin "${{ env.BRANCH }}"
+          git commit -m "🚚 chore: collected DSFR release $TAG"
+          git push --set-upstream origin "$BRANCH"
         working-directory: archive
 
-      # Trigger the release workflow
       - name: Trigger release workflow
         uses: actions/github-script@v7
+        env:
+          INPUT_TYPE: ${{ inputs.type }}
+          INPUT_BRANCH: ${{ env.BRANCH }}
+          INPUT_TAG: ${{ inputs.tag }}
         with:
           script: |
             github.rest.repos.createDispatchEvent({
               owner: context.repo.owner,
               repo: context.repo.repo,
               event_type: 'release-trigger',
-                client_payload: {
-                    type: '${{ inputs.type }}',
-                    branch: '${{ env.BRANCH }}',
-                    tag: '${{ inputs.tag }}'
-                }
+              client_payload: {
+                type: process.env.INPUT_TYPE,
+                branch: process.env.INPUT_BRANCH,
+                tag: process.env.INPUT_TAG
+              }
             });

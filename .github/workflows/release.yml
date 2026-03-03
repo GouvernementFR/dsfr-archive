@@ -30,38 +30,51 @@ jobs:
       - name: Set up environment variables
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          PAYLOAD_TYPE: ${{ github.event.client_payload.type }}
+          NEXUS_INPUT: ${{ github.event.inputs.nexus_version }}
         run: |
-          # Determine TYPE based on the event type
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ -n "${{ github.ref_name }}" ] && [ "${{ github.ref_name }}" != "" ] && [ "${{ github.ref_name }}" != "main" ]; then
-              export TYPE="${{ github.ref_name }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ -n "$REF_NAME" ] && [ "$REF_NAME" != "main" ]; then
+              TYPE="$REF_NAME"
             else
-              export TYPE="release"
+              TYPE="release"
             fi
-          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            if [ -n "${{ github.event.client_payload.type }}" ] && [ "${{ github.event.client_payload.type }}" != "" ]; then
-              export TYPE="${{ github.event.client_payload.type }}"
+          elif [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            if [ -n "$PAYLOAD_TYPE" ]; then
+              TYPE="$PAYLOAD_TYPE"
             else
-              export TYPE="release"
+              TYPE="release"
             fi
           else
-            export TYPE="release"
+            TYPE="release"
+          fi
+          
+          ALLOWED_TYPES=("release" "test")
+          if [[ ! " ${ALLOWED_TYPES[*]} " =~ " ${TYPE} " ]]; then
+            echo "Invalid TYPE: '$TYPE'. Allowed values: ${ALLOWED_TYPES[*]}"
+            exit 1
           fi
           
           # Set BRANCH based on TYPE
           if [ "$TYPE" != "release" ]; then
-            export BRANCH="$TYPE"
+            BRANCH="$TYPE"
             echo "type is not release, using branch $TYPE"
           else
-            export BRANCH="main"
+            BRANCH="main"
             echo "type is release, using branch $BRANCH"
           fi
           
-          #
-          if [ -n "${{ github.event.inputs.nexus_version }}" ] && [ "${{ github.event.inputs.nexus_version }}" != "" ]; then
-            export NEXUS_VERSION="${{ github.event.inputs.nexus_version }}"
+          # Validate and set NEXUS_VERSION if provided
+          if [ -n "$NEXUS_INPUT" ]; then
+            if ! echo "$NEXUS_INPUT" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?$'; then
+              echo "Invalid NEXUS_VERSION format: $NEXUS_INPUT"
+              exit 1
+            fi
+            NEXUS_VERSION="$NEXUS_INPUT"
           fi
-          
+
           # Export variables to GitHub environment
           echo "TYPE: $TYPE"
           echo "BRANCH: $BRANCH"
@@ -78,45 +91,42 @@ jobs:
           fetch-depth: 0
 
       # Check if releases directory exists and determine tag
-      - name: get tag
+      - name: Get tag
+        env:
+          TYPE: ${{ env.TYPE }}
         run: |
           if [ ! -d "releases" ]; then
-            echo "Releases directory does not exist or is empty. No release needed."
-            export RELEASING=false
+            echo "Releases directory does not exist. No release needed."
+            RELEASING=false
           else
-            export RELEASING=true
-          fi
-          
-          # Get all version folder names, sort, and pick the highest
-          export HIGHEST_VERSION=$(ls releases | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-.+)?$' | sort -V | tail -n1)
-          if [ -z "$HIGHEST_VERSION" ]; then
-            export HIGHEST_VERSION="v1.0.0"
+            RELEASING=true
           fi
 
-          # Determine type and appendix
-          if [ "$TYPE" = "release" ]; then
-            export BASE_TAG="${HIGHEST_VERSION}--prod"
-          else
-            export BASE_TAG="${HIGHEST_VERSION}--${{ env.TYPE }}"
+          HIGHEST_VERSION=$(ls releases | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-.+)?$' | sort -V | tail -n1)
+          if [ -z "$HIGHEST_VERSION" ]; then
+            HIGHEST_VERSION="v1.0.0"
           fi
-      
-          # Find existing tags with +build.# and increment
-          export EXISTING_TAGS=$(git tag --list "${BASE_TAG}+build.*")
-          echo "Existing tags: $EXISTING_TAGS"  
+
+          if [ "$TYPE" = "release" ]; then
+            BASE_TAG="${HIGHEST_VERSION}--prod"
+          else
+            BASE_TAG="${HIGHEST_VERSION}--${TYPE}"
+          fi
+
+          EXISTING_TAGS=$(git tag --list "${BASE_TAG}+build.*")
+          echo "Existing tags: $EXISTING_TAGS"
           if [ -z "$EXISTING_TAGS" ]; then
             echo "No existing tags found for ${BASE_TAG}+build.*"
-            export BUILD_NUM=1
+            BUILD_NUM=1
           else
             BUILD_NUM=$(echo "$EXISTING_TAGS" | sed -E "s/.*\+build\.([0-9]+)$/\1/" | sort -n | tail -n1)
-          echo "Current build number: $BUILD_NUM"
-            export BUILD_NUM=$((BUILD_NUM + 1))
+            echo "Current build number: $BUILD_NUM"
+            BUILD_NUM=$((BUILD_NUM + 1))
           fi
-      
-          # Set the final tag and file name
-          export TAG="${BASE_TAG}+build.${BUILD_NUM}"
-          export FILE="archive-${TAG}.zip"
-          
-          # Export variables to GitHub environment
+
+          TAG="${BASE_TAG}+build.${BUILD_NUM}"
+          FILE="archive-${TAG}.zip"
+
           echo "TAG: $TAG"
           echo "FILE: $FILE"
           echo "RELEASING=$RELEASING" >> $GITHUB_ENV
@@ -140,10 +150,12 @@ jobs:
       # Build the project
       - name: Build the project
         if: env.RELEASING == 'true'
+        env:
+          NEXUS_VERSION: ${{ env.NEXUS_VERSION }}
         run: |
-          if [ -n "${{ env.NEXUS_VERSION }}" ] && [ "${{ env.NEXUS_VERSION }}" != "" ]; then
+          if [ -n "$NEXUS_VERSION" ]; then
             echo "Using specified Nexus version: $NEXUS_VERSION"
-            yarn add @gouvfr/dsfr-nexus@$NEXUS_VERSION
+            yarn add "@gouvfr/dsfr-nexus@$NEXUS_VERSION"
           else
             echo "No specific Nexus version provided, using the latest version."
           fi
@@ -157,10 +169,13 @@ jobs:
         if: env.RELEASING == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ env.TAG }}
+          FILE: ${{ env.FILE }}
         run: |
-          
           mv .doc www
           mv .env env
-          zip -r ${{ env.FILE }} www env -x "*.DS_Store"
+          zip -r "$FILE" www env -x "*.DS_Store"
           git checkout main
-          gh release create ${{ env.TAG }} ${{ env.FILE }} --title "Release ${{ env.TAG }}" --notes "Automated release for version ${{ env.TAG }}"
+          gh release create "$TAG" "$FILE" \
+            --title "Release $TAG" \
+            --notes "Automated release for version $TAG"
