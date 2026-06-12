@@ -145,7 +145,7 @@ jobs:
         if: env.RELEASING == 'true'
         run: |
           corepack enable
-          yarn install --no-immutable
+          DSFR_ACCEPT_LICENSE=1 yarn install --no-immutable
 
       # Build the project
       - name: Build the project

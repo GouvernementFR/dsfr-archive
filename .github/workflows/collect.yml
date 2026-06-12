@@ -99,7 +99,7 @@ jobs:
           if [ "$MAJOR" -gt 1 ]; then
             corepack enable
           fi
-          yarn install
+          DSFR_ACCEPT_LICENSE=1 yarn install
         working-directory: dsfr
         continue-on-error: false
 
