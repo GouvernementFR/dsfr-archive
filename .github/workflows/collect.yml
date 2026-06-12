@@ -105,7 +105,7 @@ jobs:
 
       # Build the project
       - name: Build the project
-        run: yarn archive
+        run: DSFR_ACCEPT_LICENSE=1 yarn archive
         working-directory: dsfr
 
       # Create branch and remove existing release folder if it exists

@@ -160,9 +160,9 @@ jobs:
             echo "No specific Nexus version provided, using the latest version."
           fi
           yarn info @gouvfr/dsfr-nexus version
-          yarn dsfr configure
-          yarn dsfr interpret
-          yarn dsfr publish
+          DSFR_ACCEPT_LICENSE=1 yarn dsfr configure
+          DSFR_ACCEPT_LICENSE=1 yarn dsfr interpret
+          DSFR_ACCEPT_LICENSE=1 yarn dsfr publish
 
       # Perform the release using the current version
       - name: Create GitHub release
