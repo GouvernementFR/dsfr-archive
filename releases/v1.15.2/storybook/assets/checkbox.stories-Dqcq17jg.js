@@ -1,4 +1,4 @@
-import{c as S,a as l,b as y}from"./checkbox-arg-types-Bfp5TreK.js";import{e as f}from"./renderer-aLkn78UT.js";import"./_commonjsHelpers-BosuxZz1.js";const C=e=>f.render("checkbox-group",e),v=e=>C({checkbox:y(e)}),E={id:"checkbox",title:"DSFR/Component/Checkbox",render:v,argTypes:l,args:S},r={tags:["!autodocs"],args:{}},o={tags:["autodocs","!dev"],args:{id:"checkbox-default"}},s={tags:["autodocs","!dev"],args:{id:"checkbox-indeterminate"},decorators:[e=>{const c=document.createElement("script");return c.src="/js/checkbox/init-indeterminate.js",c.type="module",document.head.appendChild(c),e()}]},t={tags:["autodocs","!dev"],args:{id:"checkbox-sm",size:"sm"}};var a,n,d;r.parameters={...r.parameters,docs:{...(a=r.parameters)==null?void 0:a.docs,source:{originalSource:`{
+import{c as S,a as l,b as y}from"./checkbox-arg-types-Bfp5TreK.js";import{e as f}from"./renderer-aLkn78UT.js";import"./_commonjsHelpers-BosuxZz1.js";const C=e=>f.render("checkbox-group",e),v=e=>C({checkbox:y(e)}),E={id:"checkbox",title:"DSFR/Component/Checkbox",render:v,argTypes:l,args:S},r={tags:["!autodocs"],args:{}},o={tags:["autodocs","!dev"],args:{id:"checkbox-default"}},s={tags:["autodocs","!dev"],args:{id:"checkbox-indeterminate"},decorators:[e=>{const c=document.createElement("script");return c.src="./js/checkbox/init-indeterminate.js",c.type="module",document.head.appendChild(c),e()}]},t={tags:["autodocs","!dev"],args:{id:"checkbox-sm",size:"sm"}};var a,n,d;r.parameters={...r.parameters,docs:{...(a=r.parameters)==null?void 0:a.docs,source:{originalSource:`{
   tags: ['!autodocs'],
   args: {}
 }`,...(d=(n=r.parameters)==null?void 0:n.docs)==null?void 0:d.source}}};var i,m,p;o.parameters={...o.parameters,docs:{...(i=o.parameters)==null?void 0:i.docs,source:{originalSource:`{
@@ -13,7 +13,7 @@ import{c as S,a as l,b as y}from"./checkbox-arg-types-Bfp5TreK.js";import{e as f
   },
   decorators: [Story => {
     const script = document.createElement('script');
-    script.src = '/js/checkbox/init-indeterminate.js';
+    script.src = './js/checkbox/init-indeterminate.js';
     script.type = 'module';
     document.head.appendChild(script);
     return Story();
