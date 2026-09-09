@@ -1,0 +1,17 @@
+id: connect
+title: Bouton FranceConnect
+description: |
+  Les boutons FranceConnect et ProConnect sont des boutons spécifiques permettant d'interagir avec l'API des services concernés.
+  https://franceconnect.gouv.fr/ - https://proconnect.gouv.fr/
+doc: https://www.systeme-de-design.gouv.fr/version-courante/fr/composants/bouton-franceconnect
+wrapper: col-8
+style:
+  - core
+font-subset:
+  Regular:
+    - default.login
+  Bold:
+    - default.brand
+    - plus.brand
+    - agent.brand
+    - pro.brand
