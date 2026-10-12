@@ -1,0 +1,19 @@
+<%#
+# paramètres toggle group
+
+* toggle.toggles (array, required): liste des paramètres des interrupteurs
+
+%>
+<% eval(include('../../../../core/index.ejs')); %>
+<%
+const toggle = locals.toggle || {};
+const toggles = toggle.toggles || [];
+%>
+
+<ul class="<%= prefix %>-toggle__list">
+  <% for (const item of toggles) { %>
+    <li>
+      <%- include('./toggle', { toggle: item }); %>
+    </li>
+  <% } %>
+</ul>
