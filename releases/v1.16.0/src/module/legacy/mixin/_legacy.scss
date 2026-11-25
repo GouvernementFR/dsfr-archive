@@ -1,0 +1,16 @@
+/// Styles spécifiques pour les plateformes antérieures
+///
+/// legacy.is(ie11) {
+///   .foo {
+///   }
+/// }
+@mixin is($target) {
+  @if $target == ie11 {
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+      @content;
+    }
+  }
+  @else {
+    @content;
+  }
+}

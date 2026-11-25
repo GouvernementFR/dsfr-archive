@@ -1,0 +1,48 @@
+////
+/// Core Module : Grid row
+/// @group core
+////
+
+#{ns(grid-row)} {
+  @include display-flex(null, null, null, wrap);
+  @include margin(0);
+  @include padding(0);
+
+  // Vertical alignment
+  &--top {
+    align-items: flex-start;
+  }
+
+  &--bottom {
+    align-items: flex-end;
+  }
+
+  &--middle {
+    align-items: center;
+  }
+
+  // Horizontal alignment
+  &--left {
+    justify-content: flex-start;
+  }
+
+  &--right {
+    justify-content: flex-end;
+  }
+
+  &--center {
+    justify-content: center;
+  }
+}
+
+ul#{ns(grid-row)},
+ol#{ns(grid-row)} {
+  list-style-type: none;
+  counter-reset: none;
+
+  & > li {
+    counter-increment: none;
+    @include padding-bottom(0);
+    @include marker(none);
+  }
+}
