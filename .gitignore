@@ -4,3 +4,5 @@ node_modules
 .doc
 .dsfr
 .env
+.DS_Store
+.dsfr.yml

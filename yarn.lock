@@ -480,7 +480,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:^19.6.0"
     "@commitlint/config-conventional": "npm:^19.6.0"
-    "@gouvfr/dsfr-nexus": "npm:^2.0.0-alpha.3.2"
+    "@gouvfr/dsfr-nexus": "npm:^2.0.0-alpha.3.5"
     husky: "npm:^9.1.7"
   languageName: unknown
   linkType: soft
@@ -507,24 +507,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-lore@npm:=2.0.0-alpha.3.2":
-  version: 2.0.0-alpha.3.2
-  resolution: "@gouvfr/dsfr-lore@npm:2.0.0-alpha.3.2"
+"@gouvfr/dsfr-lore@npm:=2.0.0-alpha.3.5":
+  version: 2.0.0-alpha.3.5
+  resolution: "@gouvfr/dsfr-lore@npm:2.0.0-alpha.3.5"
   dependencies:
     "@gouvfr/dsfr-forge": "npm:=2.0.0-alpha.3.1"
-  checksum: 10c0/b16faee22af13f0f153a262ac02c2b42e933ef62720bfb104804011396297ac2f5789f32ff168cc50fec1091a0d3f7c79f4ccdd6c13984288406f003c287a825
+  checksum: 10c0/7b6567f5b2525b7f644cfab5b0ab82bef11ed2a16283a199d5bb4a675adfe15198c3175fc0799b69cd7598bd966cfe176ee7b14f2ca423ff3eaefb62ca6076ec
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-nexus@npm:^2.0.0-alpha.3.2":
-  version: 2.0.0-alpha.3.2
-  resolution: "@gouvfr/dsfr-nexus@npm:2.0.0-alpha.3.2"
+"@gouvfr/dsfr-nexus@npm:^2.0.0-alpha.3.5":
+  version: 2.0.0-alpha.3.5
+  resolution: "@gouvfr/dsfr-nexus@npm:2.0.0-alpha.3.5"
   dependencies:
     "@gouvfr/dsfr-alchemist": "npm:=2.0.0-alpha.3.1"
     "@gouvfr/dsfr-forge": "npm:=2.0.0-alpha.3.1"
     "@gouvfr/dsfr-kit": "npm:=2.0.0-alpha.3.1"
-    "@gouvfr/dsfr-lore": "npm:=2.0.0-alpha.3.2"
-    "@gouvfr/dsfr-roller": "npm:=2.0.0-alpha.3.2"
+    "@gouvfr/dsfr-lore": "npm:=2.0.0-alpha.3.5"
+    "@gouvfr/dsfr-roller": "npm:=2.0.0-alpha.3.5"
     browser-sync: "npm:^3.0.3"
     mdast-util-directive: "npm:^3.0.0"
     mdast-util-from-markdown: "npm:^2.0.1"
@@ -544,28 +544,28 @@ __metadata:
     "@gouvfr/dsfr-weave": "*"
   bin:
     dsfr: index.js
-  checksum: 10c0/83c234ad27e0997135fde29d81644f66eff130c9ab88f88c55fb9ce522da4d597cbbe69b8436cab3cd3f3cb289f94790c164cef47fefb5a5053320e4a27e75b5
+  checksum: 10c0/d624074493c07e5441e20c37cda037955ed81c0669a1ec0fc4e47e65672f9117216a5c582f24cdb0cfd41603779a9302d3f53b759277a4f633df7044bb8f4901
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-publisher@npm:@gouvfr/dsfr@1.15.4":
-  version: 1.15.4
-  resolution: "@gouvfr/dsfr@npm:1.15.4"
-  checksum: 10c0/f7fa1b24dbd51c4518a4c2aa3ac57b8b49ef0837618667dd2333be22ce01eaaeb7d08e23b9c91b0dec62b968badad2ea23de729084de69fbd1a7a3a1c8771fa3
+"@gouvfr/dsfr-publisher@npm:@gouvfr/dsfr@1.16.0-rc.1":
+  version: 1.16.0-rc.1
+  resolution: "@gouvfr/dsfr@npm:1.16.0-rc.1"
+  checksum: 10c0/8a32f936dbe7f425df1fd99fc3ad61f389ab9536c89d601acee741fd14d46d9ca06a1c52f259e39a933af275717f77f1ee86beec9455be1452619361c0cd09b6
   languageName: node
   linkType: hard
 
-"@gouvfr/dsfr-roller@npm:=2.0.0-alpha.3.2":
-  version: 2.0.0-alpha.3.2
-  resolution: "@gouvfr/dsfr-roller@npm:2.0.0-alpha.3.2"
+"@gouvfr/dsfr-roller@npm:=2.0.0-alpha.3.5":
+  version: 2.0.0-alpha.3.5
+  resolution: "@gouvfr/dsfr-roller@npm:2.0.0-alpha.3.5"
   dependencies:
     "@gouvfr/dsfr-forge": "npm:=2.0.0-alpha.3.1"
     "@gouvfr/dsfr-kit": "npm:=2.0.0-alpha.3.1"
-    "@gouvfr/dsfr-publisher": "npm:@gouvfr/dsfr@1.15.4"
+    "@gouvfr/dsfr-publisher": "npm:@gouvfr/dsfr@1.16.0-rc.1"
     deepmerge: "npm:^4.3.1"
     ejs: "npm:^3.1.10"
     yaml: "npm:^2.4.1"
-  checksum: 10c0/04da291583324d018447caafd7cd2ca0b3bf524d4f343e4891c43558030c071e713eeca00b1b75497ba91b8ac2dd6f82a6a95d363b866e53a7c80dd25f996bcc
+  checksum: 10c0/7b2cde6bf12a259389aacbfa5d2d3ba8777d8b0f6d2b621eea3a5f34507422625ee7143ca2a540a7151fef96dafa1f606cf63f3eeedeb13061a77592cce59844
   languageName: node
   linkType: hard
 
